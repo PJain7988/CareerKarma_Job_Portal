@@ -221,17 +221,18 @@ Make sure to update:
 
 ---
 
+
 ## 📸 Screenshots
 
-Add your screenshots here:
+### 🏠 Home Page
+![Home Page](./screenshots/home.png)
 
-```
-/screenshots/home.png
-/screenshots/recuriter.png
-/screenshots/HR.png
-```
+### 👩‍💼 Recruiter Dashboard
+![Recruiter Dashboard](./screenshots/recruiter.png)
 
----
+### 🧑‍💻 HR Panel
+![HR Panel](./screenshots/HR.png)
+
 
 ## 🧠 Learning Outcomes
 
