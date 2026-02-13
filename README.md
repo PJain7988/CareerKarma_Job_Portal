@@ -228,7 +228,7 @@ Make sure to update:
 ![Home Page](./screenshots/home.png)
 
 ### 👩‍💼 Recruiter Dashboard
-![Recruiter Dashboard](./screenshots/recruiter.png)
+![Recruiter Dashboard](./screenshots\recuriter.png)
 
 ### 🧑‍💻 HR Panel
 ![HR Panel](./screenshots/HR.png)
