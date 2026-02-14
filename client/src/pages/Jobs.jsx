@@ -117,7 +117,7 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
 };
 
 export default function Jobs() {
-  const BACKEND_URL = import.meta.env.VITE_API_URL || "https://careerkarma-job-portal.onrender.com/"
+  const BACKEND_URL = import.meta.env.VITE_API_URL || "https://careerkarma-job-portal.onrender.com"
   const navigate = useNavigate();
   const locationHook = useLocation();
 

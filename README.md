@@ -113,7 +113,7 @@ MONGO_URI=mongodb+srv://PJain:PJain1234@cluster0.jsomqau.mongodb.net/Project_0
 CLIENT_URL=https://career-karma-job-portal.vercel.app/
 EMAIL_USER=72062priya@gmail.com
 EMAIL_PASS="aprk xoxj zqbi ohyw"
-VITE_API_URL=https://careerkarma-job-portal.onrender.com/
+VITE_API_URL=https://careerkarma-job-portal.onrender.com
 
 ```
 

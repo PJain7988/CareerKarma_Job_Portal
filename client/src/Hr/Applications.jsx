@@ -3,7 +3,7 @@ import axios from "axios";
 import { Eye, Search, X, CheckCircle, XCircle, Download } from "lucide-react";
 
 const Applications = () => {
-  const BACKEND_URL = import.meta.env.VITE_API_URL || "https://careerkarma-job-portal.onrender.com/";
+  const BACKEND_URL = import.meta.env.VITE_API_URL || "https://careerkarma-job-portal.onrender.com";
   
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
