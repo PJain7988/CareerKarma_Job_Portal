@@ -29,7 +29,7 @@ const app = express();
 
 app.use(express.json());
 const corsOptions = {
-  origin: ["https://career-karma-job-portal.vercel.app/",
+  origin: ["https://career-karma-job-portal.vercel.app",
   "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
