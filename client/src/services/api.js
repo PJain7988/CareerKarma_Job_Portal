@@ -4,7 +4,7 @@ export const createJob = (data) => api.post("/jobs", data);
 export const getAllJobs = () => api.get("/jobs");
 
 const api = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: "https://careerkarma-job-portal.onrender.com//api",
   headers: { "Content-Type": "application/json" },
 });
 

@@ -110,10 +110,10 @@ Add the following variables inside `.env`:
 ```
 PORT=5001
 MONGO_URI=mongodb+srv://PJain:PJain1234@cluster0.jsomqau.mongodb.net/Project_0
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=https://career-karma-job-portal.vercel.app/
 EMAIL_USER=72062priya@gmail.com
 EMAIL_PASS="aprk xoxj zqbi ohyw"
-VITE_API_URL=http://localhost:5001
+VITE_API_URL=https://careerkarma-job-portal.onrender.com/
 
 ```
 
@@ -142,7 +142,7 @@ npm run dev
 
 Client runs at:
 ```
-http://localhost:5173
+https://career-karma-job-portal.vercel.app/
 ```
 
 The frontend proxies `/api` requests to the backend using `vite.config.js`.

@@ -7,7 +7,7 @@ import {
 import { Briefcase, Users, CheckCircle, Clock, Download, FileText } from "lucide-react";
 
 const Analytics = () => {
-  const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+  const BACKEND_URL = import.meta.env.VITE_API_URL || "https://careerkarma-job-portal.onrender.com/";
   
   const [stats, setStats] = useState({
     jobs: 0,
