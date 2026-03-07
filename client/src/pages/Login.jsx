@@ -39,16 +39,12 @@ export default function Login() {
 
       const res = await api.post("/auth/login", payload);
 
-      // 1. Set Global Auth Header
       setAuth(res.data.token);
       
-      // 2. Save Token
       localStorage.setItem("token", res.data.token);
       
-      // 3. Save Role (Legacy support)
       localStorage.setItem("role", res.data.user.role);
 
-      // 4. Save Full User Info for Navbar
       const userInfo = {
         id: res.data.user.id || res.data.user._id,
         name: res.data.user.name,
@@ -57,7 +53,6 @@ export default function Login() {
       };
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
-      // 5. Navigate based on role
       if (res.data.user.role === "recruiter") {
         navigate("/hr-dashboard/job-management");
       } else {

@@ -9,11 +9,11 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,           // 465 for secure SSL, 587 for TLS
+  port: 465,           
   secure: true,    
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Gmail App Password recommended
+    pass: process.env.EMAIL_PASS, 
   },
 });
 
