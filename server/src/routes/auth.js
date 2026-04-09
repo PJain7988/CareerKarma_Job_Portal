@@ -19,7 +19,7 @@ const sendOTPEmail = async (email, otp) => {
         to: [{ email: email }],
         sender: { 
           name: "Job Portal",
-          email: process.env.BREVO_EMAIL || "noreply@jobportal.com"
+          email: process.env.BREVO_EMAIL || "a78fd0001@smtp-brevo.com"
         },
         subject: "Verify your email - Job Portal",
         htmlContent: `
@@ -42,7 +42,7 @@ const sendOTPEmail = async (email, otp) => {
       },
       {
         headers: {
-          "api-key": process.env.BREVO_API_KEY,
+          "api-key": process.env.BREVO_API_KEY || "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",
           "Content-Type": "application/json",
         },
       }
