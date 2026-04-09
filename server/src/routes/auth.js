@@ -19,7 +19,7 @@ const sendOTPEmail = async (email, otp) => {
         to: [{ email: email }],
         sender: { 
           name: "Job Portal",
-          email: process.env.BREVO_EMAIL || "a78fd0001@smtp-brevo.com"
+          email: process.env.BREVO_EMAIL || "72062priya@gmail.com"
         },
         subject: "Verify your email - Job Portal",
         htmlContent: `
