@@ -42,7 +42,7 @@ const sendOTPEmail = async (email, otp) => {
       },
       {
         headers: {
-          "api-key": process.env.BREVO_API_KEY || "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",
+          "api-key": process.env.BREVO_API_KEY,
           "Content-Type": "application/json",
         },
       }
