@@ -2,71 +2,57 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import nodemailer from "nodemailer";
+import axios from "axios";
 
 const router = express.Router();
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Create transporter with Brevo SMTP
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,  // TLS (STARTTLS)
-  auth: {
-    user: process.env.BREVO_EMAIL,
-    pass: process.env.BREVO_SMTP_KEY,
-  },
-  connectionTimeout: 15000,
-  socketTimeout: 15000,
-  maxConnections: 5,
-  maxMessages: 5,
-  logger: false,
-  debug: false,
-});
-
-// Verify transporter on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ Brevo transporter error:", error.message);
-  } else {
-    console.log("✅ Brevo transporter ready");
-  }
-});
-
+// Send email using Brevo REST API
 const sendOTPEmail = async (email, otp) => {
   console.log("📧 Initiating OTP email to:", email);
   
   try {
-    const info = await transporter.sendMail({
-      from: `"Job Portal" <${process.env.BREVO_EMAIL}>`,
-      to: email,
-      subject: "Verify your email - Job Portal",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Email Verification</h2>
-          <p style="font-size: 16px; color: #666;">
-            Your OTP for email verification is:
-          </p>
-          <div style="background-color: #f0f0f0; padding: 15px; border-radius: 5px; text-align: center;">
-            <h1 style="color: #007bff; letter-spacing: 5px; margin: 0;">${otp}</h1>
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        to: [{ email: email }],
+        sender: { 
+          name: "Job Portal",
+          email: process.env.BREVO_EMAIL || "noreply@jobportal.com"
+        },
+        subject: "Verify your email - Job Portal",
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Email Verification</h2>
+            <p style="font-size: 16px; color: #666;">
+              Your OTP for email verification is:
+            </p>
+            <div style="background-color: #f0f0f0; padding: 15px; border-radius: 5px; text-align: center;">
+              <h1 style="color: #007bff; letter-spacing: 5px; margin: 0;">${otp}</h1>
+            </div>
+            <p style="color: #999; font-size: 14px;">
+              This OTP will expire in 10 minutes. Do not share this code with anyone.
+            </p>
+            <p style="color: #999; font-size: 12px;">
+              If you didn't request this, please ignore this email.
+            </p>
           </div>
-          <p style="color: #999; font-size: 14px;">
-            This OTP will expire in 10 minutes. Do not share this code with anyone.
-          </p>
-          <p style="color: #999; font-size: 12px;">
-            If you didn't request this, please ignore this email.
-          </p>
-        </div>
-      `,
-      text: `Your OTP for email verification is ${otp}. It will expire in 10 minutes.`,
-    });
+        `,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    console.log("✅ Email sent successfully via Brevo:", info.messageId);
+    console.log("✅ Email sent successfully via Brevo API:", response.data.messageId);
     return true;
   } catch (error) {
-    console.error("❌ Email send failed:", error.message);
-    throw new Error(`Failed to send OTP: ${error.message}`);
+    console.error("❌ Email send failed:", error.response?.data?.message || error.message);
+    throw new Error(`Failed to send OTP: ${error.response?.data?.message || error.message}`);
   }
 };
 
