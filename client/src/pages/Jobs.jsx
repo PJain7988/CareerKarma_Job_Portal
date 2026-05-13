@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import { MapPin, Search, X, Filter, Briefcase, Upload, CheckCircle, Lock, Eye, Mail, Globe, Clock } from "lucide-react";
+import { MapPin, Search, X, Filter, Briefcase, Upload, CheckCircle, Lock, Eye, Mail, Globe, Clock, BrainCircuit } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Footer from "../components/ui/Footer";
 
@@ -82,8 +82,11 @@ const JobDetailModal = ({ job, onClose, onApply, hasApplied }) => {
 
 const ApplyModal = ({ job, onClose, onSubmit }) => {
   const [coverLetter, setCoverLetter] = useState("");
+  const [resumeText, setResumeText] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -92,15 +95,36 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
     linkedin: ""
   });
 
+  const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const analyze = async () => {
+    if (!resumeText) {
+      alert("Please paste your resume text below to analyze.");
+      return;
+    }
+    setAnalyzing(true);
+    try {
+      const { data } = await axios.post(`${BACKEND_URL}/api/ai/analyze-resume`, { 
+        resumeText: resumeText, 
+        jobDescription: job.description 
+      });
+      setAiAnalysis(data);
+    } catch (e) {
+      alert("AI analysis failed.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await onSubmit(job, coverLetter, resumeFile, formData);
+    await onSubmit(job, coverLetter, resumeText, resumeFile, formData);
     setIsSubmitting(false);
   };
 
@@ -177,9 +201,47 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
                   </div>
                 </div>
 
-                <div>
+                <div className="mb-4">
                   <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Cover Letter (Optional)</label>
-                  <textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Introduce yourself and explain why you're a strong fit..." rows={4} className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y transition" />
+                  <textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Introduce yourself and explain why you're a strong fit..." rows={3} className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y transition" />
+                </div>
+
+                <div className="mb-4">
+                  <label className="flex items-center justify-between text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">
+                    <span>AI Resume Analysis (Optional)</span>
+                    <button type="button" onClick={analyze} disabled={analyzing} className="flex items-center gap-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-1.5 rounded-full font-bold transition disabled:opacity-50">
+                      <BrainCircuit size={14} /> {analyzing ? "Analyzing..." : "Analyze Match"}
+                    </button>
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">Paste your resume text below to get an instant AI match score.</p>
+                  <textarea value={resumeText} onChange={(e) => setResumeText(e.target.value)} rows={3} className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none resize-y transition" placeholder="Paste resume plain text here..." />
+                  
+                  {aiAnalysis && (
+                    <div className="mt-4 bg-purple-50 border border-purple-100 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-bold text-purple-900 flex items-center gap-2 text-sm"><BrainCircuit size={16}/> AI Analysis Result</h4>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${aiAnalysis.score >= 80 ? 'bg-green-100 text-green-700' : aiAnalysis.score >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                          {aiAnalysis.score}% Match
+                        </span>
+                      </div>
+                      
+                      {aiAnalysis.missingKeywords && aiAnalysis.missingKeywords.length > 0 && (
+                        <div className="mb-2">
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Missing Keywords</p>
+                          <div className="flex flex-wrap gap-1">
+                            {aiAnalysis.missingKeywords.map((kw, i) => (
+                              <span key={i} className="bg-white border border-purple-200 text-purple-700 text-[10px] px-1.5 py-0.5 rounded-md">{kw}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div>
+                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Suggestion</p>
+                        <p className="text-xs text-purple-800 leading-relaxed">{aiAnalysis.llmSuggestion}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -351,7 +413,7 @@ export default function Jobs() {
       setViewingJob(job);
   };
 
-  const handleModalSubmit = async (job, coverLetter, resumeFile, candidateDetails) => {
+  const handleModalSubmit = async (job, coverLetter, resumeText, resumeFile, candidateDetails) => {
     let resumeFilename = "";
     try {
       if (resumeFile) {
@@ -364,6 +426,7 @@ export default function Jobs() {
         await axios.post(`${BACKEND_URL}/api/applications`, { 
             jobId: job.id, 
             coverLetter, 
+            resumeText,
             resume: resumeFilename,
             candidateDetails
         }, getAuthConfig());

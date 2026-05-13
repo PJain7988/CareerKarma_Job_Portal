@@ -75,44 +75,126 @@ const LMS = () => {
     (activeTab === "my" ? enrolledIds.includes(c.id) : true)
   );
 
-  return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      {viewingCourse && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-5xl rounded-xl overflow-hidden shadow-2xl h-[85vh] flex flex-col">
-                <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
-                    <h2 className="text-lg font-bold flex items-center gap-2"><PlayCircle size={20}/> {viewingCourse.title}</h2>
-                    <button onClick={() => setViewingCourse(null)} className="hover:text-red-400 transition"><X size={24}/></button>
+  const [activeCourseTab, setActiveCourseTab] = useState("curriculum");
+  const [courseNotes, setCourseNotes] = useState("");
+
+  useEffect(() => {
+    if (viewingCourse) {
+      const savedNotes = localStorage.getItem(`notes_${userId}_${viewingCourse.id}`) || "";
+      setCourseNotes(savedNotes);
+      setActiveCourseTab("curriculum");
+    }
+  }, [viewingCourse, userId]);
+
+  const saveNotes = () => {
+    localStorage.setItem(`notes_${userId}_${viewingCourse.id}`, courseNotes);
+    alert("Notes saved successfully!");
+  };
+
+  const renderCourseModal = () => {
+    if (!viewingCourse) return null;
+    return (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-6xl rounded-2xl overflow-hidden shadow-2xl h-[90vh] flex flex-col relative">
+                <div className="bg-gray-900 text-white p-4 flex justify-between items-center shrink-0 border-b border-gray-800">
+                    <h2 className="text-xl font-bold flex items-center gap-3">
+                        <PlayCircle size={24} className="text-indigo-400"/> {viewingCourse.title}
+                    </h2>
+                    <button onClick={() => setViewingCourse(null)} className="text-gray-400 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-1.5 transition">
+                        <X size={20}/>
+                    </button>
                 </div>
-                <div className="flex-1 flex">
-                    <div className="flex-1 bg-black flex items-center justify-center text-white flex-col text-center">
-                        <iframe 
-                            className="w-full h-full" 
-                            src="https://www.youtube.com/embed/jBzwzrDvZ18?autoplay=1" 
-                            title="Course Video" 
-                            frameBorder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowFullScreen
-                        ></iframe>
+                
+                <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                    {/* Video Player Section */}
+                    <div className="flex-1 bg-black flex flex-col">
+                        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                            <iframe 
+                                className="absolute inset-0 w-full h-full" 
+                                src="https://www.youtube.com/embed/jBzwzrDvZ18?autoplay=1" 
+                                title="Course Video" 
+                                frameBorder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+                        <div className="p-6 bg-gray-900 text-gray-300 flex-1 overflow-y-auto">
+                            <h3 className="text-white text-2xl font-bold mb-2">About this Course</h3>
+                            <p className="leading-relaxed">{viewingCourse.description}</p>
+                            <div className="mt-6 flex items-center gap-4 text-sm text-gray-400">
+                                <span className="flex items-center gap-1"><User size={16}/> Instructor: {viewingCourse.instructor}</span>
+                                <span className="flex items-center gap-1"><Clock size={16}/> Duration: {viewingCourse.duration}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="w-80 bg-gray-50 p-6 overflow-y-auto border-l border-gray-200">
-                        <h3 className="font-bold text-lg mb-2 text-gray-800">Course Info</h3>
-                        <p className="text-sm text-gray-600 mb-6 leading-relaxed">{viewingCourse.description}</p>
-                        <h4 className="font-bold text-xs text-gray-500 uppercase mb-3 tracking-wider">Curriculum</h4>
-                        <ul className="space-y-2">
-                            {[1,2,3,4].map(i => (
-                                <li key={i} className="flex items-center gap-3 text-sm p-3 bg-white rounded-lg border border-gray-100 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition">
-                                    <div className="bg-indigo-100 text-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">{i}</div>
-                                    <span className="truncate">Module {i}: Lesson Title</span>
-                                </li>
-                            ))}
-                        </ul>
+
+                    {/* Sidebar Section */}
+                    <div className="w-full md:w-96 bg-gray-50 border-l border-gray-200 flex flex-col shrink-0">
+                        {/* Tabs */}
+                        <div className="flex border-b border-gray-200 bg-white">
+                            <button 
+                                onClick={() => setActiveCourseTab("curriculum")} 
+                                className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider border-b-2 transition ${activeCourseTab === "curriculum" ? "border-indigo-600 text-indigo-600 bg-indigo-50/50" : "border-transparent text-gray-500 hover:text-gray-800"}`}
+                            >
+                                Curriculum
+                            </button>
+                            <button 
+                                onClick={() => setActiveCourseTab("notes")} 
+                                className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider border-b-2 transition ${activeCourseTab === "notes" ? "border-indigo-600 text-indigo-600 bg-indigo-50/50" : "border-transparent text-gray-500 hover:text-gray-800"}`}
+                            >
+                                My Notes
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-4">
+                            {activeCourseTab === "curriculum" ? (
+                                <ul className="space-y-3">
+                                    {[1,2,3,4,5,6].map(i => (
+                                        <li key={i} className="flex items-center gap-3 text-sm p-3.5 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:border-indigo-300 hover:shadow-md transition group">
+                                            <div className="bg-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0 transition">
+                                                {i}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-gray-800">Module {i}</p>
+                                                <p className="text-xs text-gray-500">Video Lesson • 15 min</p>
+                                            </div>
+                                            <PlayCircle size={18} className="text-gray-300 group-hover:text-indigo-500 transition"/>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="h-full flex flex-col">
+                                    <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-sm text-yellow-800 mb-4 flex items-start gap-2">
+                                        <Star size={16} className="mt-0.5 shrink-0"/>
+                                        <p>Jot down important timestamps and concepts. These are saved automatically to your device.</p>
+                                    </div>
+                                    <textarea 
+                                        className="flex-1 w-full bg-white border border-gray-200 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-sm"
+                                        placeholder="Type your notes here..."
+                                        value={courseNotes}
+                                        onChange={(e) => setCourseNotes(e.target.value)}
+                                    ></textarea>
+                                    <button 
+                                        onClick={saveNotes}
+                                        className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2"
+                                    >
+                                        <CheckCircle size={18} /> Save Notes
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-      )}
+    );
+  };
 
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans">
+      {renderCourseModal()}
+      
       <div className="bg-indigo-900 pt-16 pb-24 px-6 text-center text-white relative">
         <div className="relative z-10">
             <h1 className="text-4xl font-extrabold mb-4 tracking-tight">Learning Hub</h1>
