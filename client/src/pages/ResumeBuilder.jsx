@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { FileText, Download, Eye, Save, Sparkles, RefreshCcw, Upload } from "lucide-react";
 
 const templateStyles = {
@@ -106,15 +107,24 @@ Experience and projects are arrays. Others are strings.
     if (e.target.files && e.target.files[0]) setPhoto(URL.createObjectURL(e.target.files[0]));
   };
 
-  const makePDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(18); doc.text(`${f.firstName} ${f.lastName}`, 14, 20);
-    doc.setFontSize(14); doc.setTextColor(100); doc.text(f.role || "", 14, 28);
-    doc.setTextColor(0); doc.setFontSize(11);
-    doc.text(`${f.phone || ""} | ${f.email || ""} | ${f.linkedin || ""} | ${f.github || ""}`, 14, 36);
-    doc.setFontSize(12); doc.text("Summary", 14, 48);
-    doc.setFontSize(10); doc.text(doc.splitTextToSize(f.summary || "", 180), 14, 54);
-    doc.save("Resume.pdf");
+  const makePDF = async () => {
+    if (activeTab !== "preview") {
+      setActiveTab("preview");
+      await new Promise(r => setTimeout(r, 500));
+    }
+    const element = document.getElementById("resume-preview-container");
+    if (!element) return;
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("Resume.pdf");
+    } catch (err) {
+      console.error("Failed to generate PDF", err);
+    }
   };
 
   const renderInput = (label, placeholder, key, rows = 1) => (
@@ -160,7 +170,7 @@ Experience and projects are arrays. Others are strings.
             {error && <div className="mb-4 text-sm text-red-600">Error: {error}</div>}
 
             {activeTab==="preview" ? (
-              <div className={`p-10 shadow-xl max-w-3xl mx-auto ${templateStyles[template].container} ${templateStyles[template].font}`}>
+              <div id="resume-preview-container" className={`p-10 shadow-xl max-w-3xl mx-auto ${templateStyles[template].container} ${templateStyles[template].font}`}>
                 {photo && <div className="flex justify-center mb-6"><img src={photo} alt="Profile" className={templateStyles[template].photoShape}/></div>}
                 <h1 className={`text-center ${templateStyles[template].title}`}>{f.firstName} {f.lastName}</h1>
                 <p className="text-xl text-indigo-600 text-center font-medium">{f.role}</p>

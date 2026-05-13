@@ -85,9 +85,15 @@ const LMS = () => {
                     <button onClick={() => setViewingCourse(null)} className="hover:text-red-400 transition"><X size={24}/></button>
                 </div>
                 <div className="flex-1 flex">
-                    <div className="flex-1 bg-black flex items-center justify-center text-white flex-col p-10 text-center">
-                        <PlayCircle size={80} className="mb-6 opacity-80 hover:scale-110 transition duration-300 cursor-pointer text-indigo-500"/>
-                        <h3 className="text-2xl font-bold">Start Learning</h3>
+                    <div className="flex-1 bg-black flex items-center justify-center text-white flex-col text-center">
+                        <iframe 
+                            className="w-full h-full" 
+                            src="https://www.youtube.com/embed/jBzwzrDvZ18?autoplay=1" 
+                            title="Course Video" 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowFullScreen
+                        ></iframe>
                     </div>
                     <div className="w-80 bg-gray-50 p-6 overflow-y-auto border-l border-gray-200">
                         <h3 className="font-bold text-lg mb-2 text-gray-800">Course Info</h3>

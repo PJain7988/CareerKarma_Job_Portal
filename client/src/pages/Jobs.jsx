@@ -129,6 +129,8 @@ export default function Jobs() {
   const [viewingJob, setViewingJob] = useState(null);
   const [applied, setApplied] = useState({}); 
   const [isGuest, setIsGuest] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 9;
   
   const [showJobSuggestions, setShowJobSuggestions] = useState(false);
   const [showLocSuggestions, setShowLocSuggestions] = useState(false);
@@ -226,10 +228,21 @@ export default function Jobs() {
     });
   }, [rawJobs, searchQuery, locationQuery, filters]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredJobs]);
+
   useEffect(() => { 
-      const limit = isGuest ? 9 : filteredJobs.length; 
-      setDisplayJobs(filteredJobs.slice(0, limit)); 
-  }, [filteredJobs, isGuest]);
+      if (isGuest) {
+          setDisplayJobs(filteredJobs.slice(0, jobsPerPage)); 
+      } else {
+          const start = (currentPage - 1) * jobsPerPage;
+          const end = start + jobsPerPage;
+          setDisplayJobs(filteredJobs.slice(start, end)); 
+      }
+  }, [filteredJobs, isGuest, currentPage]);
+
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
   useEffect(() => {
     if (searchQuery.length > 1) {
@@ -431,6 +444,32 @@ export default function Jobs() {
                 <Link to="/register" className="bg-white text-indigo-600 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-gray-100 transition">
                     Create Free Account
                 </Link>
+            </div>
+        )}
+
+        {!isGuest && totalPages > 1 && (
+            <div className="mt-8 flex justify-center items-center gap-4">
+                <button 
+                    disabled={currentPage === 1}
+                    onClick={() => {
+                      setCurrentPage(prev => Math.max(prev - 1, 1));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="px-5 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 disabled:opacity-50 transition"
+                >
+                    Previous
+                </button>
+                <span className="text-gray-600 font-medium">Page {currentPage} of {totalPages}</span>
+                <button 
+                    disabled={currentPage === totalPages}
+                    onClick={() => {
+                      setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="px-5 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 disabled:opacity-50 transition"
+                >
+                    Next
+                </button>
             </div>
         )}
       </main>

@@ -104,7 +104,7 @@ const router = express.Router();
 // 1. STUDENT: Apply for a job
 router.post("/", protect, async (req, res) => {
   try {
-    const { jobId, coverLetter, resume } = req.body;
+    const { jobId, coverLetter, resume, resumeText, candidateDetails } = req.body;
 
     const job = await Job.findById(jobId);
     if (!job) return res.status(404).json({ message: "Job not found" });
@@ -124,6 +124,8 @@ router.post("/", protect, async (req, res) => {
       employer: job.postedBy,
       coverLetter,
       resume,
+      resumeText,
+      candidateDetails,
       status: "Pending"
     });
 

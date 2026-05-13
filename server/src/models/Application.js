@@ -21,6 +21,18 @@ const applicationSchema = new mongoose.Schema(
       type: String, 
       default: "",
     },
+    resumeText: {
+      type: String,
+      default: "",
+    },
+    candidateDetails: {
+      firstName: { type: String, default: "" },
+      lastName: { type: String, default: "" },
+      email: { type: String, default: "" },
+      phone: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      portfolio: { type: String, default: "" }
+    },
     status: {
       type: String,
       enum: ["Pending", "Accepted", "Rejected", "Interviewing"],
@@ -30,6 +42,10 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    notes: {
+      type: String,
+      default: "",
+    }
   },
   { timestamps: true }
 );
