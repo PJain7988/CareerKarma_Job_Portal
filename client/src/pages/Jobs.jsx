@@ -84,33 +84,116 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    linkedin: ""
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await onSubmit(job, coverLetter, resumeFile);
+    await onSubmit(job, coverLetter, resumeFile, formData);
     setIsSubmitting(false);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4 animate-in fade-in zoom-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={20} /></button>
-        <h2 className="text-2xl font-bold text-gray-800 mb-1">Apply for {job.title}</h2>
-        <p className="text-sm text-gray-500 mb-6">{job.company}</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Resume</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition relative cursor-pointer">
-              <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setResumeFile(e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-              <div className="flex flex-col items-center justify-center gap-2">
-                {resumeFile ? (<><CheckCircle className="text-green-500 w-8 h-8" /><span className="text-sm font-medium text-gray-800">{resumeFile.name}</span></>) : (<><Upload className="text-gray-400 w-8 h-8" /><span className="text-sm text-gray-500">Click to upload PDF</span></>)}
-              </div>
-            </div>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] px-4 animate-in fade-in duration-200 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 text-white/80 hover:text-white bg-black/20 hover:bg-black/40 rounded-full p-1 transition">
+            <X size={20} />
+        </button>
+        
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white shrink-0">
+          <h2 className="text-2xl font-extrabold mb-1">Apply for {job.title}</h2>
+          <div className="flex items-center gap-3 text-indigo-100 text-sm">
+            <span className="flex items-center gap-1"><Briefcase size={14}/> {job.company}</span>
+            <span className="flex items-center gap-1"><MapPin size={14}/> {job.location}</span>
           </div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Cover Letter</label><textarea required value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Why are you a good fit?" rows={4} className="w-full border border-gray-300 rounded-lg p-3 outline-none resize-none" /></div>
-          <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition disabled:opacity-50">{isSubmitting ? "Sending..." : "Submit Application"}</button>
-        </form>
+        </div>
+
+        <div className="p-6 overflow-y-auto flex-1">
+            <form id="apply-form" onSubmit={handleSubmit} className="space-y-6">
+              
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">Personal Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">First Name *</label>
+                    <input required type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="John" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Last Name *</label>
+                    <input required type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Doe" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Email Address *</label>
+                    <input required type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="john@example.com" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Phone Number</label>
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="+1 (555) 000-0000" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">LinkedIn Profile</label>
+                    <input type="url" name="linkedin" value={formData.linkedin} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://linkedin.com/in/johndoe" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">Resume & Cover Letter</h3>
+                
+                <div className="mb-4">
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Upload Resume (PDF, DOCX) *</label>
+                  <div className="border-2 border-dashed border-indigo-200 bg-indigo-50 rounded-xl p-6 text-center hover:bg-indigo-100 transition relative cursor-pointer group">
+                    <input required type="file" accept=".pdf,.doc,.docx" onChange={(e) => setResumeFile(e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      {resumeFile ? (
+                        <>
+                          <div className="bg-green-100 p-2 rounded-full text-green-600"><CheckCircle size={24} /></div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-800">{resumeFile.name}</p>
+                            <p className="text-xs text-gray-500">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bg-white p-3 rounded-full text-indigo-500 shadow-sm group-hover:scale-110 transition"><Upload size={24} /></div>
+                          <div>
+                            <p className="text-sm font-bold text-indigo-900">Click to upload or drag and drop</p>
+                            <p className="text-xs text-indigo-500">PDF, DOC, DOCX up to 5MB</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Cover Letter (Optional)</label>
+                  <textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} placeholder="Introduce yourself and explain why you're a strong fit..." rows={4} className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y transition" />
+                </div>
+              </div>
+
+            </form>
+        </div>
+        
+        <div className="bg-gray-50 px-6 py-4 border-t flex justify-end gap-3 shrink-0">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-100 transition">Cancel</button>
+            <button type="submit" form="apply-form" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition shadow-md disabled:opacity-70 flex items-center gap-2">
+                {isSubmitting ? (
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Submitting...</>
+                ) : "Submit Application"}
+            </button>
+        </div>
       </div>
     </div>
   );
@@ -268,7 +351,7 @@ export default function Jobs() {
       setViewingJob(job);
   };
 
-  const handleModalSubmit = async (job, coverLetter, resumeFile) => {
+  const handleModalSubmit = async (job, coverLetter, resumeFile, candidateDetails) => {
     let resumeFilename = "";
     try {
       if (resumeFile) {
@@ -278,7 +361,12 @@ export default function Jobs() {
         resumeFilename = (uploadRes.data.filePath || "").split(/[/\\]/).pop(); 
       }
       if (job.isLocal) {
-        await axios.post(`${BACKEND_URL}/api/applications`, { jobId: job.id, coverLetter, resume: resumeFilename }, getAuthConfig());
+        await axios.post(`${BACKEND_URL}/api/applications`, { 
+            jobId: job.id, 
+            coverLetter, 
+            resume: resumeFilename,
+            candidateDetails
+        }, getAuthConfig());
       } 
       alert("Success! Application sent to HR.");
       setApplied(prev => ({ ...prev, [job.id]: true }));
