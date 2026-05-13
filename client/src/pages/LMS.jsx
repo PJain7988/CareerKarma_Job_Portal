@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download } from "lucide-react";
+import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download, Sparkles, Loader2 } from "lucide-react";
+import api from "../services/api";
 
 const DEFAULT_MOCK_COURSES = [
-  { id: "m1", title: "Python for Data Science", instructor: "Dr. Angela Yu", price: "$12.99", duration: "22 Weeks", status: "Published", image: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg", category: "Data Science", description: "Master Python and data analysis libraries like Pandas and NumPy." },
-  { id: "m2", title: "Complete Digital Marketing", instructor: "Rob Percival", price: "Free", duration: "4 Weeks", status: "Published", image: "https://cdn-icons-png.flaticon.com/512/1998/1998087.png", category: "Marketing", description: "Learn SEO, Social Media Marketing, and Google Ads from scratch." },
-  { id: "m3", title: "UI/UX Design Masterclass", instructor: "Gary Simon", price: "$49.99", duration: "8 Weeks", status: "Published", image: "https://cdn-icons-png.flaticon.com/512/5202/5202998.png", category: "Design", description: "Design beautiful interfaces using Figma and Adobe XD." },
-  { id: "m4", title: "Machine Learning A-Z", instructor: "Kirill Eremenko", price: "$94.99", duration: "12 Weeks", status: "Published", image: "https://upload.wikimedia.org/wikipedia/commons/1/17/Google-flutter-logo.png", category: "AI", description: "Build powerful ML models using Python and R." },
-  { id: "m5", title: "Docker & Kubernetes", instructor: "Stephen Grider", price: "$19.99", duration: "6 Weeks", status: "Published", image: "https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png", category: "DevOps", description: "Master containerization and orchestration." },
-  { id: "m6", title: "Financial Analysis 101", instructor: "365 Careers", price: "Free", duration: "3 Weeks", status: "Published", image: "https://cdn-icons-png.flaticon.com/512/2702/2702602.png", category: "Finance", description: "Excel skills for financial modeling and valuation." }
+  { id: "m1", title: "Python for Data Science", instructor: "Dr. Angela Yu", price: "$12.99", duration: "22 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=800", category: "Data Science", description: "Master Python and data analysis libraries like Pandas and NumPy." },
+  { id: "m2", title: "Complete Digital Marketing", instructor: "Rob Percival", price: "Free", duration: "4 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&q=80&w=800", category: "Marketing", description: "Learn SEO, Social Media Marketing, and Google Ads from scratch." },
+  { id: "m3", title: "UI/UX Design Masterclass", instructor: "Gary Simon", price: "$49.99", duration: "8 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800", category: "Design", description: "Design beautiful interfaces using Figma and Adobe XD." },
+  { id: "m4", title: "Machine Learning A-Z", instructor: "Kirill Eremenko", price: "$94.99", duration: "12 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800", category: "AI", description: "Build powerful ML models using Python and R." },
+  { id: "m5", title: "Docker & Kubernetes", instructor: "Stephen Grider", price: "$19.99", duration: "6 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&q=80&w=800", category: "DevOps", description: "Master containerization and orchestration." },
+  { id: "m6", title: "Financial Analysis 101", instructor: "365 Careers", price: "Free", duration: "3 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=800", category: "Finance", description: "Excel skills for financial modeling and valuation." }
 ];
 
 const LMS = () => {
@@ -91,6 +92,21 @@ const LMS = () => {
     alert("Notes saved successfully!");
   };
 
+  const [generatingNotes, setGeneratingNotes] = useState(false);
+
+  const handleGenerateAINotes = async () => {
+    if (!viewingCourse) return;
+    setGeneratingNotes(true);
+    try {
+        const { data } = await api.post("/ai/chat", { prompt: `Generate a highly professional, concise study guide or summary notes for a course titled: ${viewingCourse.title}. Include key concepts and bullet points. Do not include markdown formatting like asterisks, use plain text.` });
+        setCourseNotes(prev => prev + (prev ? "\n\n" : "") + data.message);
+    } catch (err) {
+        alert("Failed to generate AI notes.");
+    } finally {
+        setGeneratingNotes(false);
+    }
+  };
+
   const renderCourseModal = () => {
     if (!viewingCourse) return null;
     return (
@@ -165,11 +181,22 @@ const LMS = () => {
                                 </ul>
                             ) : (
                                 <div className="h-full flex flex-col">
-                                    <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-sm text-indigo-900 mb-4 flex items-start gap-3 shadow-sm">
-                                        <Star size={18} className="mt-0.5 shrink-0 text-indigo-600"/>
-                                        <p>Jot down important timestamps and concepts. These are saved automatically to your device.</p>
+                                    <div className="flex gap-2 mb-4">
+                                        <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-sm text-indigo-900 flex-1 flex items-start gap-3 shadow-sm">
+                                            <Star size={18} className="mt-0.5 shrink-0 text-indigo-600"/>
+                                            <p>Jot down important timestamps and concepts. These are saved automatically to your device.</p>
+                                        </div>
+                                        <button 
+                                            onClick={handleGenerateAINotes}
+                                            disabled={generatingNotes}
+                                            title="Generate AI Notes for this topic"
+                                            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl px-4 py-2 font-bold shadow-md hover:shadow-lg transition flex flex-col items-center justify-center gap-1 disabled:opacity-50 min-w-[90px] shrink-0"
+                                        >
+                                            {generatingNotes ? <Loader2 size={20} className="animate-spin"/> : <Sparkles size={20}/>}
+                                            <span className="text-[10px] uppercase tracking-wider">AI Notes</span>
+                                        </button>
                                     </div>
-                                    <textarea 
+                                    <textarea  
                                         className="flex-1 w-full bg-white border border-gray-200 rounded-xl p-5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none shadow-inner transition leading-relaxed text-gray-700"
                                         placeholder="Type your structured notes here..."
                                         value={courseNotes}

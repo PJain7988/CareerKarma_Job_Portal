@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { FileText, Download, Eye, Save, Sparkles, Plus, Trash2, Upload } from "lucide-react";
+import { FileText, Download, Eye, Save, Sparkles, Plus, Trash2, Upload, Edit2 } from "lucide-react";
 import api from "../services/api";
 
 export default function ResumeBuilder() {
@@ -469,7 +469,11 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
             {loading ? "Generating..." : "AI Auto-Fill"}
           </button>
           <div className="h-6 w-px bg-gray-300 mx-1"></div>
-          <button onClick={() => setActiveTab("preview")} className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-bold transition shadow-sm"><Eye size={16} /> Preview</button>
+          {activeTab === "preview" ? (
+            <button onClick={() => setActiveTab("personal")} className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-bold transition shadow-sm text-gray-700"><Edit2 size={16} /> Edit Details</button>
+          ) : (
+            <button onClick={() => setActiveTab("preview")} className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-bold transition shadow-sm text-gray-700"><Eye size={16} /> Preview</button>
+          )}
           <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-bold transition shadow-sm"><Save size={16} /> Save</button>
           <button onClick={makePDF} className="flex items-center gap-2 px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-black font-bold shadow-md transition"><Download size={18} /> Download PDF</button>
         </div>
