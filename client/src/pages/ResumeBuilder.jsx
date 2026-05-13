@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { FileText, Download, Eye, Save, Sparkles, Plus, Trash2, Upload } from "lucide-react";
+import api from "../services/api";
 
 export default function ResumeBuilder() {
   const [activeTab, setActiveTab] = useState("personal");
@@ -54,19 +55,12 @@ export default function ResumeBuilder() {
     setError("");
     setLoading(true);
     try {
-      const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-      const res = await fetch(`${BACKEND_URL}/api/ai/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Request failed");
+      const { data } = await api.post("/ai/chat", { prompt });
       setLoading(false);
       return data.message || "";
     } catch (err) {
       setLoading(false);
-      setError(err.message || "AI generation failed");
+      setError(err.response?.data?.error || err.message || "AI generation failed");
       return "";
     }
   }
@@ -365,11 +359,19 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
       <div className="flex justify-between items-center px-6 py-4 bg-white shadow z-10 sticky top-0">
         <h1 className="text-2xl font-black flex items-center gap-2 text-indigo-700"><FileText /> Resume Pro</h1>
-        <div className="flex gap-3">
-          <button disabled={loading} onClick={handleAIAssist} className="flex items-center gap-2 px-4 py-2 border border-purple-200 text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 font-bold transition shadow-sm"><Sparkles size={16} /> {loading ? "Generating..." : "AI Auto-Fill"}</button>
+        <div className="flex gap-3 items-center">
+          <button 
+            disabled={loading} 
+            onClick={handleAIAssist} 
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-bold transition shadow-lg hover:shadow-purple-500/30 transform hover:-translate-y-0.5"
+          >
+            <Sparkles size={18} className={loading ? "animate-spin" : "animate-pulse"} /> 
+            {loading ? "Generating..." : "AI Auto-Fill"}
+          </button>
+          <div className="h-6 w-px bg-gray-300 mx-1"></div>
           <button onClick={() => setActiveTab("preview")} className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-bold transition shadow-sm"><Eye size={16} /> Preview</button>
           <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 font-bold transition shadow-sm"><Save size={16} /> Save</button>
-          <button onClick={makePDF} className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold shadow-md transition"><Download size={18} /> Download PDF</button>
+          <button onClick={makePDF} className="flex items-center gap-2 px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-black font-bold shadow-md transition"><Download size={18} /> Download PDF</button>
         </div>
       </div>
 
