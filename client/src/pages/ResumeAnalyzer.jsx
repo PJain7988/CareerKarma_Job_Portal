@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { AlertTriangle, Loader2, Award, ShieldCheck, Sparkles, FileText, Briefcase, RefreshCcw, CheckCircle } from "lucide-react";
+import { AlertTriangle, Loader2, Award, ShieldCheck, Sparkles, FileText, Briefcase, RefreshCcw, CheckCircle, UploadCloud } from "lucide-react";
 import api from "../services/api";
 
 export default function ResumeAnalyzer() {
@@ -13,7 +13,7 @@ export default function ResumeAnalyzer() {
   const [error, setError] = useState("");
 
   const handleAnalyze = async () => {
-    if (!resumeText.trim()) return alert("Please paste your resume text first!");
+    if (!resumeText.trim()) return alert("Please paste or upload your resume text first!");
     if (!targetJob.trim()) return alert("Please provide a target job role or description!");
     
     setAnalyzing(true);
@@ -29,15 +29,19 @@ export default function ResumeAnalyzer() {
         ? data.keywordsMatched.slice(0, 5).map(k => ({ name: k, val: Math.floor(Math.random() * 20 + 80) }))
         : [{ name: "Formatting", val: 85 }, { name: "Keywords", val: 75 }];
 
-      const tipsArray = data.llmSuggestion 
-        ? data.llmSuggestion.split('\n').filter(line => line.trim().startsWith('-') || line.trim().startsWith('*')).map(line => line.replace(/^[-*]\s*/, ''))
-        : ["Quantify your achievements with metrics.", "Use more impactful action verbs.", "Ensure your formatting is ATS-friendly."];
+      let tipsArray = [];
+      if (data.llmSuggestion) {
+          tipsArray = data.llmSuggestion.split('\n').filter(line => line.trim().startsWith('-') || line.trim().startsWith('*')).map(line => line.replace(/^[-*]\s*/, ''));
+      }
+      if (tipsArray.length === 0 && data.llmSuggestion) {
+          tipsArray = [data.llmSuggestion];
+      }
 
       setResult({
         score: data.score || 0,
         keywords: keywordsData,
         missing: data.missingKeywords || [],
-        tips: tipsArray.length > 0 ? tipsArray : [data.llmSuggestion || "Your resume looks good, but could use more specific details."]
+        tips: tipsArray.length > 0 ? tipsArray : ["Quantify your achievements with metrics.", "Use more impactful action verbs.", "Ensure your formatting is ATS-friendly."]
       });
     } catch (err) {
       console.error(err);
@@ -45,6 +49,20 @@ export default function ResumeAnalyzer() {
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      setResumeText(evt.target.result);
+    };
+    reader.onerror = () => {
+      alert("Error reading file");
+    };
+    reader.readAsText(file);
   };
 
   const reset = () => {
@@ -75,9 +93,23 @@ export default function ResumeAnalyzer() {
             <div className="grid md:grid-cols-2 gap-8 mb-8">
                 {/* Resume Text Input */}
                 <div className="flex flex-col">
-                    <label className="flex items-center gap-2 text-sm font-bold text-gray-800 mb-3 uppercase tracking-wider">
-                        <FileText size={18} className="text-indigo-600"/> 1. Paste Resume Content
-                    </label>
+                    <div className="flex items-center justify-between mb-3">
+                        <label className="flex items-center gap-2 text-sm font-bold text-gray-800 uppercase tracking-wider">
+                            <FileText size={18} className="text-indigo-600"/> 1. Paste Resume Content
+                        </label>
+                        <div className="relative overflow-hidden cursor-pointer">
+                            <button className="flex items-center gap-1 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+                                <UploadCloud size={14}/> Upload .txt
+                            </button>
+                            <input 
+                                type="file" 
+                                accept=".txt" 
+                                onChange={handleFileUpload} 
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                title="Upload text resume"
+                            />
+                        </div>
+                    </div>
                     <textarea 
                         value={resumeText} 
                         onChange={(e) => setResumeText(e.target.value)}

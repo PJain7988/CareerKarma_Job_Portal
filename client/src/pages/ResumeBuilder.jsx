@@ -17,7 +17,8 @@ export default function ResumeBuilder() {
     education: [], 
     experience: [], 
     skills: "", 
-    projects: []
+    projects: [],
+    certifications: []
   };
 
   const [f, setF] = useState(initialData);
@@ -26,7 +27,7 @@ export default function ResumeBuilder() {
     const saved = localStorage.getItem("resumeDataV2");
     if (saved) {
       try { 
-        setF(JSON.parse(saved)); 
+        setF({ ...initialData, ...JSON.parse(saved) }); 
       } catch {}
     } else {
         // attempt migration from v1
@@ -86,11 +87,12 @@ Return JSON strictly with the following keys:
 - experience (array of objects with keys: company, role, date, desc)
 - education (array of objects with keys: school, degree, date, desc)
 - projects (array of objects with keys: name, tech, desc)
+- certifications (array of objects with keys: name, issuer, date)
 - linkedin (string)
 - github (string)
 - website (string)
 
-Make the descriptions professional, use action verbs, and keep it realistic. Provide 2 realistic experiences and 2 projects. Output ONLY valid JSON, no markdown formatting.
+Make the descriptions professional, use action verbs, and keep it realistic. Provide 2 realistic experiences, 2 projects, and 1 certification. Output ONLY valid JSON, no markdown formatting.
 `;
 
     try {
@@ -110,6 +112,7 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
         experience: Array.isArray(parsed.experience) ? parsed.experience : prev.experience,
         education: Array.isArray(parsed.education) ? parsed.education : prev.education,
         projects: Array.isArray(parsed.projects) ? parsed.projects : prev.projects,
+        certifications: Array.isArray(parsed.certifications) ? parsed.certifications : prev.certifications,
         linkedin: parsed.linkedin || prev.linkedin,
         github: parsed.github || prev.github,
         website: parsed.website || prev.website,
@@ -266,6 +269,23 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
             </div>
           </div>
         )}
+
+        {f.certifications && f.certifications.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-800 uppercase tracking-wider border-b-2 border-indigo-600 inline-block pb-1 mb-4">Certifications</h2>
+            <div className="space-y-4">
+              {f.certifications.map((cert, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-end mb-1">
+                    <h3 className="text-lg font-bold text-slate-800">{cert.name}</h3>
+                    <span className="text-sm font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{cert.date}</span>
+                  </div>
+                  <p className="text-md font-medium text-slate-500 mb-2">{cert.issuer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -350,6 +370,23 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
         <div className="mb-8">
           <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-1 mb-4">Technical Skills</h2>
           <p className="text-sm text-gray-700 leading-relaxed">{f.skills}</p>
+        </div>
+      )}
+
+      {f.certifications && f.certifications.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-1 mb-4">Certifications</h2>
+          <div className="space-y-4">
+            {f.certifications.map((cert, i) => (
+              <div key={i} className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800">{cert.name}</h3>
+                  <p className="text-sm font-medium text-gray-600">{cert.issuer}</p>
+                </div>
+                <span className="text-sm font-medium text-gray-500 whitespace-nowrap">{cert.date}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -450,6 +487,21 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
                     </div>
                 </div>
             )}
+
+            {f.certifications && f.certifications.length > 0 && (
+                <div className="mb-8">
+                    <h3 className="text-lg font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Certifications</h3>
+                    <div className="space-y-4">
+                        {f.certifications.map((cert, i) => (
+                            <div key={i}>
+                                <h4 className="text-sm font-bold text-gray-900 leading-tight">{cert.name}</h4>
+                                <p className="text-sm text-indigo-600 mt-1">{cert.issuer}</p>
+                                <p className="text-xs text-gray-400 mt-1">{cert.date}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
       </div>
     </div>
@@ -494,7 +546,7 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
           <div className="p-4">
             <h2 className="font-bold text-xs uppercase tracking-wider text-gray-500 mb-3">Sections</h2>
             <div className="space-y-1">
-              {[{id:"personal", label:"Personal Details"}, {id:"summary", label:"Summary"}, {id:"experience", label:"Experience"}, {id:"education", label:"Education"}, {id:"skills_projects", label:"Skills & Projects"}].map(t => (
+              {[{id:"personal", label:"Personal Details"}, {id:"summary", label:"Summary"}, {id:"experience", label:"Experience"}, {id:"education", label:"Education"}, {id:"skills_projects", label:"Skills & Projects"}, {id:"certifications", label:"Certifications"}].map(t => (
                 <button key={t.id} onClick={() => setActiveTab(t.id)} className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition ${activeTab===t.id ? "bg-indigo-600 text-white shadow-md" : "text-gray-600 hover:bg-gray-100"}`}>
                   {t.label}
                 </button>
@@ -613,6 +665,26 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
                         </div>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {activeTab === "certifications" && (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center border-b pb-4">
+                      <h2 className="text-2xl font-bold text-gray-900">Certifications</h2>
+                      <button onClick={() => addArrayItem("certifications", { name:"", issuer:"", date:"" })} className="flex items-center gap-1 text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition shadow-sm"><Plus size={16}/> Add Certification</button>
+                    </div>
+                    {f.certifications && f.certifications.map((cert, i) => (
+                      <div key={i} className="p-5 border border-gray-200 rounded-xl bg-white shadow-sm relative group mb-4 hover:border-indigo-300 transition">
+                        <button onClick={() => removeArrayItem("certifications", i)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><Trash2 size={18}/></button>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pr-8">
+                          <div className="flex flex-col"><label className="text-xs font-bold text-gray-600 mb-1">Certification Name</label><input value={cert.name} onChange={(e)=>updateArray("certifications", i, "name", e.target.value)} className="border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-indigo-500" placeholder="e.g. AWS Solutions Architect" /></div>
+                          <div className="flex flex-col"><label className="text-xs font-bold text-gray-600 mb-1">Issuer</label><input value={cert.issuer} onChange={(e)=>updateArray("certifications", i, "issuer", e.target.value)} className="border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-indigo-500" placeholder="e.g. Amazon Web Services" /></div>
+                          <div className="flex flex-col"><label className="text-xs font-bold text-gray-600 mb-1">Date Earned</label><input value={cert.date} onChange={(e)=>updateArray("certifications", i, "date", e.target.value)} className="border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-indigo-500" placeholder="e.g. 2023" /></div>
+                        </div>
+                      </div>
+                    ))}
+                    {(!f.certifications || f.certifications.length === 0) && <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">No certifications added yet. Click "Add Certification" above.</div>}
                   </div>
                 )}
 

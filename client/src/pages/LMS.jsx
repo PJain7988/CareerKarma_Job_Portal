@@ -273,7 +273,7 @@ const LMS = () => {
               return (
                 <div key={course.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-xl transition duration-300 flex flex-col border border-gray-100 group">
                     <div className="h-48 bg-gray-200 relative overflow-hidden flex items-center justify-center">
-                        <img src={course.image || "https://via.placeholder.com/400x200?text=Course"} className="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt={course.title} onError={(e) => e.target.src = "https://via.placeholder.com/400x200?text=Course"}/>
+                        <img src={course.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt={course.title} onError={(e) => e.target.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}/>
                         {isEnrolled && <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow flex items-center gap-1"><CheckCircle size={12} /> Enrolled</div>}
                     </div>
                     <div className="p-6 flex-1 flex flex-col">

@@ -117,31 +117,40 @@ router.post("/analyze-resume", async (req, res) => {
       return res.status(400).json({ error: "Resume text and job description are required." });
     }
 
-    const resWords = new Set(resumeText.toLowerCase().match(/\b[a-z]+\b/g) || []);
-    const jdWords = jobDescription.toLowerCase().match(/\b[a-z]+\b/g) || [];
-    const jdSet = new Set(jdWords);
+    const prompt = `You are an expert ATS (Applicant Tracking System). 
+Analyze this resume against the job description.
+Resume Text:
+${resumeText}
 
-    const overlap = jdWords.filter((w) => resWords.has(w));
-    const score = Math.round((overlap.length / Math.max(1, jdSet.size)) * 100);
-    const missingKeywords = [...jdSet].filter((w) => !resWords.has(w)).slice(0, 20);
+Job Description:
+${jobDescription}
 
-    const llmSuggestion = await askAI([
-      {
-        role: "system",
-        content: "You are an assistant that improves resume matching suggestions."
-      },
-      {
-        role: "user",
-        content: `Resume Text:\n${resumeText}\n\nJob Description:\n${jobDescription}\n\nGiven a simple keyword overlap score of ${score}%, list 5 concrete improvements as bullet points.`
-      }
-    ]);
+Return a valid JSON object strictly with these keys:
+- "score": A number between 0 and 100 representing the ATS match score.
+- "keywordsMatched": Array of up to 5 important skills/keywords found in both.
+- "missingKeywords": Array of up to 5 important skills/keywords missing from the resume.
+- "llmSuggestion": A string containing exactly 3 actionable bullet points to improve the resume.
 
-    res.json({
-      score,
-      keywordsMatched: [...new Set(overlap)].slice(0, 50),
-      missingKeywords,
-      llmSuggestion: llmSuggestion || "⚠️ No suggestion from AI."
-    });
+Output ONLY valid JSON, no markdown formatting.`;
+
+    const reply = await askAI([{ role: "user", content: prompt }]);
+    let parsed = null;
+    
+    try {
+        const cleaned = reply.replace(/```json\n?|\n?```/g, '').trim();
+        parsed = JSON.parse(cleaned);
+    } catch (err) {
+        console.error("Failed to parse JSON from AI:", reply);
+        // Fallback
+        parsed = {
+            score: 50,
+            keywordsMatched: ["Experience"],
+            missingKeywords: ["Specific Skills"],
+            llmSuggestion: "- Tailor your resume more closely to the job description.\n- Add quantifiable achievements.\n- Ensure formatting is ATS friendly."
+        };
+    }
+
+    res.json(parsed);
   } catch (e) {
     console.error("❌ /analyze-resume error:", e.message);
     res.status(500).json({ error: e.message });
