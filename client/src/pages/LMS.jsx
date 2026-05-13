@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X } from "lucide-react";
+import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download } from "lucide-react";
 
 const DEFAULT_MOCK_COURSES = [
   { id: "m1", title: "Python for Data Science", instructor: "Dr. Angela Yu", price: "$12.99", duration: "22 Weeks", status: "Published", image: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg", category: "Data Science", description: "Master Python and data analysis libraries like Pandas and NumPy." },
@@ -165,22 +165,41 @@ const LMS = () => {
                                 </ul>
                             ) : (
                                 <div className="h-full flex flex-col">
-                                    <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-sm text-yellow-800 mb-4 flex items-start gap-2">
-                                        <Star size={16} className="mt-0.5 shrink-0"/>
+                                    <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-sm text-indigo-900 mb-4 flex items-start gap-3 shadow-sm">
+                                        <Star size={18} className="mt-0.5 shrink-0 text-indigo-600"/>
                                         <p>Jot down important timestamps and concepts. These are saved automatically to your device.</p>
                                     </div>
                                     <textarea 
-                                        className="flex-1 w-full bg-white border border-gray-200 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-indigo-500 resize-none shadow-sm"
-                                        placeholder="Type your notes here..."
+                                        className="flex-1 w-full bg-white border border-gray-200 rounded-xl p-5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none shadow-inner transition leading-relaxed text-gray-700"
+                                        placeholder="Type your structured notes here..."
                                         value={courseNotes}
                                         onChange={(e) => setCourseNotes(e.target.value)}
                                     ></textarea>
-                                    <button 
-                                        onClick={saveNotes}
-                                        className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2"
-                                    >
-                                        <CheckCircle size={18} /> Save Notes
-                                    </button>
+                                    <div className="mt-4 flex gap-3">
+                                        <button 
+                                            onClick={saveNotes}
+                                            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2 transform hover:-translate-y-0.5"
+                                        >
+                                            <CheckCircle size={18} /> Save Notes
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                const blob = new Blob([courseNotes], { type: 'text/plain' });
+                                                const url = window.URL.createObjectURL(blob);
+                                                const a = document.createElement('a');
+                                                a.href = url;
+                                                a.download = `${viewingCourse.title.replace(/\s+/g, '_')}_Notes.txt`;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                document.body.removeChild(a);
+                                                window.URL.revokeObjectURL(url);
+                                            }}
+                                            disabled={!courseNotes.trim()}
+                                            className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 font-bold py-3 rounded-xl transition shadow-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+                                        >
+                                            <Download size={18} /> Download
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>

@@ -355,6 +355,106 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
     </div>
   );
 
+  const renderModernTemplate = () => (
+    <div id="resume-preview-container" className="w-full bg-white flex flex-col font-sans text-gray-800" style={{ minHeight: "1122px" }}>
+      {/* Header */}
+      <div className="bg-indigo-700 text-white p-10 flex items-center justify-between">
+        <div>
+            <h1 className="text-4xl font-black uppercase tracking-tight">{f.firstName} {f.lastName}</h1>
+            <h2 className="text-xl text-indigo-200 mt-2 font-medium">{f.role}</h2>
+        </div>
+        {photo && <img src={photo} alt="Profile" className="w-28 h-28 rounded-xl object-cover border-4 border-indigo-500 shadow-lg"/>}
+      </div>
+
+      <div className="flex flex-1">
+        {/* Left Column */}
+        <div className="w-2/3 p-10">
+            {f.summary && (
+                <div className="mb-8">
+                    <h3 className="text-xl font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Summary</h3>
+                    <p className="text-sm leading-relaxed text-gray-600">{f.summary}</p>
+                </div>
+            )}
+            
+            {f.experience && f.experience.length > 0 && (
+                <div className="mb-8">
+                    <h3 className="text-xl font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Experience</h3>
+                    <div className="space-y-6">
+                        {f.experience.map((exp, i) => (
+                            <div key={i} className="relative pl-4 border-l-2 border-indigo-200">
+                                <div className="absolute w-3 h-3 bg-indigo-500 rounded-full -left-[7px] top-1.5 border-2 border-white"></div>
+                                <h4 className="text-md font-bold text-gray-900">{exp.role}</h4>
+                                <div className="text-sm font-semibold text-indigo-600 mb-1">{exp.company} <span className="text-gray-400 font-normal ml-2">| {exp.date}</span></div>
+                                <ul className="text-sm text-gray-600 leading-relaxed mt-2 list-none space-y-1">
+                                    {exp.desc.split('\n').filter(Boolean).map((line, j) => <li key={j} className="flex gap-2"><span className="text-indigo-400 font-bold">•</span><span>{line.replace(/^[•\-\*]\s*/, '')}</span></li>)}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+            
+            {f.projects && f.projects.length > 0 && (
+                <div className="mb-8">
+                    <h3 className="text-xl font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Projects</h3>
+                    <div className="space-y-5">
+                        {f.projects.map((proj, i) => (
+                            <div key={i}>
+                                <h4 className="text-md font-bold text-gray-900">{proj.name}</h4>
+                                {proj.tech && <p className="text-xs font-semibold text-indigo-600 mb-2">{proj.tech}</p>}
+                                <ul className="text-sm text-gray-600 leading-relaxed list-none space-y-1">
+                                    {proj.desc.split('\n').filter(Boolean).map((line, j) => <li key={j} className="flex gap-2"><span className="text-indigo-400 font-bold">•</span><span>{line.replace(/^[•\-\*]\s*/, '')}</span></li>)}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+
+        {/* Right Column */}
+        <div className="w-1/3 bg-gray-50 p-10 border-l border-gray-100">
+            <div className="mb-8">
+                <h3 className="text-lg font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Contact</h3>
+                <div className="space-y-3 text-sm text-gray-600">
+                    {f.email && <div className="flex flex-col"><span className="text-xs font-bold text-gray-400 uppercase">Email</span><span>{f.email}</span></div>}
+                    {f.phone && <div className="flex flex-col"><span className="text-xs font-bold text-gray-400 uppercase">Phone</span><span>{f.phone}</span></div>}
+                    {f.location && <div className="flex flex-col"><span className="text-xs font-bold text-gray-400 uppercase">Location</span><span>{f.location}</span></div>}
+                    {f.linkedin && <div className="flex flex-col"><span className="text-xs font-bold text-gray-400 uppercase">LinkedIn</span><span>{f.linkedin}</span></div>}
+                    {f.github && <div className="flex flex-col"><span className="text-xs font-bold text-gray-400 uppercase">GitHub</span><span>{f.github}</span></div>}
+                </div>
+            </div>
+
+            {f.skills && (
+                <div className="mb-8">
+                    <h3 className="text-lg font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {f.skills.split(',').map((skill, i) => skill.trim() && (
+                            <span key={i} className="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full">{skill.trim()}</span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {f.education && f.education.length > 0 && (
+                <div className="mb-8">
+                    <h3 className="text-lg font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Education</h3>
+                    <div className="space-y-4">
+                        {f.education.map((edu, i) => (
+                            <div key={i}>
+                                <h4 className="text-sm font-bold text-gray-900 leading-tight">{edu.degree}</h4>
+                                <p className="text-sm text-indigo-600 mt-1">{edu.school}</p>
+                                <p className="text-xs text-gray-400 mt-1">{edu.date}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
       <div className="flex justify-between items-center px-6 py-4 bg-white shadow z-10 sticky top-0">
@@ -380,7 +480,7 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
           <div className="p-4 border-b">
             <h2 className="font-bold text-xs uppercase tracking-wider text-gray-500 mb-3">Templates</h2>
             <div className="space-y-2">
-              {["Executive", "Clean"].map(t => (
+              {["Executive", "Modern", "Clean"].map(t => (
                 <button key={t} onClick={() => setTemplate(t)} className={`w-full text-left px-4 py-2 rounded-lg text-sm font-bold transition border ${template===t ? "border-indigo-500 bg-indigo-50 text-indigo-700" : "border-transparent text-gray-600 hover:bg-gray-50"}`}>
                   {t} Template
                 </button>
@@ -405,7 +505,7 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
 
             {activeTab === "preview" ? (
               <div className="shadow-2xl rounded-lg overflow-hidden border border-gray-200 mx-auto w-full max-w-[850px] bg-white transform origin-top hover:shadow-3xl transition duration-500">
-                {template === "Executive" ? renderExecutiveTemplate() : renderCleanTemplate()}
+                {template === "Executive" ? renderExecutiveTemplate() : template === "Modern" ? renderModernTemplate() : renderCleanTemplate()}
               </div>
             ) : (
               <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 animate-in fade-in zoom-in-95 duration-200">
