@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
 const DEFAULT_MOCK_COURSES = [
-  { id: "m1", title: "Python for Data Science", instructor: "Dr. Angela Yu", price: "$12.99", duration: "22 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=800", category: "Data Science", description: "Master Python and data analysis libraries like Pandas and NumPy." },
-  { id: "m2", title: "Complete Digital Marketing", instructor: "Rob Percival", price: "Free", duration: "4 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&q=80&w=800", category: "Marketing", description: "Learn SEO, Social Media Marketing, and Google Ads from scratch." },
-  { id: "m3", title: "UI/UX Design Masterclass", instructor: "Gary Simon", price: "$49.99", duration: "8 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800", category: "Design", description: "Design beautiful interfaces using Figma and Adobe XD." },
-  { id: "m4", title: "Machine Learning A-Z", instructor: "Kirill Eremenko", price: "$94.99", duration: "12 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800", category: "AI", description: "Build powerful ML models using Python and R." },
-  { id: "m5", title: "Docker & Kubernetes", instructor: "Stephen Grider", price: "$19.99", duration: "6 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&q=80&w=800", category: "DevOps", description: "Master containerization and orchestration." },
-  { id: "m6", title: "Financial Analysis 101", instructor: "365 Careers", price: "Free", duration: "3 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=800", category: "Finance", description: "Excel skills for financial modeling and valuation." }
+  { id: "m1", title: "Python for Data Science", instructor: "Dr. Angela Yu", price: "$12.99", duration: "22 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=800", category: "Data Science", description: "Master Python and data analysis libraries like Pandas and NumPy.", videoUrl: "https://www.youtube.com/embed/rfscVS0vtbw" },
+  { id: "m2", title: "Complete Digital Marketing", instructor: "Rob Percival", price: "Free", duration: "4 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&q=80&w=800", category: "Marketing", description: "Learn SEO, Social Media Marketing, and Google Ads from scratch.", videoUrl: "https://www.youtube.com/embed/z6m5n9LzN7s" },
+  { id: "m3", title: "UI/UX Design Masterclass", instructor: "Gary Simon", price: "$49.99", duration: "8 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800", category: "Design", description: "Design beautiful interfaces using Figma and Adobe XD.", videoUrl: "https://www.youtube.com/embed/c9Wg6ndoxag" },
+  { id: "m4", title: "Machine Learning A-Z", instructor: "Kirill Eremenko", price: "$94.99", duration: "12 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800", category: "AI", description: "Build powerful ML models using Python and R.", videoUrl: "https://www.youtube.com/embed/GwIo3gDZCVQ" },
+  { id: "m5", title: "Docker & Kubernetes", instructor: "Stephen Grider", price: "$19.99", duration: "6 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&q=80&w=800", category: "DevOps", description: "Master containerization and orchestration.", videoUrl: "https://www.youtube.com/embed/fqMOX6JJhGo" },
+  { id: "m6", title: "Financial Analysis 101", instructor: "365 Careers", price: "Free", duration: "3 Weeks", status: "Published", image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=800", category: "Finance", description: "Excel skills for financial modeling and valuation.", videoUrl: "https://www.youtube.com/embed/WEd_mXAn9H8" }
 ];
 
 const LMS = () => {
@@ -24,6 +24,7 @@ const LMS = () => {
   const [paymentCourse, setPaymentCourse] = useState(null);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [showEnrollSuccess, setShowEnrollSuccess] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("upi"); // 'upi' or 'card'
 
   useEffect(() => {
     
@@ -425,55 +426,75 @@ const LMS = () => {
 
                       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                           {/* Payment Methods Grid */}
-                          <div className="grid grid-cols-1 gap-3 mb-8">
-                              <button className="flex items-center gap-4 p-4 border-2 border-indigo-600 bg-indigo-50/50 rounded-2xl text-left transition relative group">
-                                  <div className="bg-indigo-100 p-3 rounded-xl text-indigo-600 group-hover:scale-110 transition duration-300">
+                          <div className="grid grid-cols-2 gap-3 mb-8">
+                              <button 
+                                onClick={() => setPaymentMethod("upi")}
+                                className={`flex flex-col items-center gap-3 p-4 border-2 rounded-2xl transition relative group ${paymentMethod === 'upi' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
+                              >
+                                  <div className={`p-3 rounded-xl transition duration-300 ${paymentMethod === 'upi' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
                                     <Smartphone size={24} />
                                   </div>
-                                  <div>
-                                    <p className="font-bold text-gray-900">UPI / QR Code</p>
-                                    <p className="text-xs text-gray-500">GPay, PhonePe, Paytm, and more</p>
-                                  </div>
-                                  <div className="ml-auto w-5 h-5 rounded-full border-4 border-indigo-600 bg-white"></div>
+                                  <span className={`font-bold text-sm ${paymentMethod === 'upi' ? 'text-indigo-900' : 'text-gray-500'}`}>UPI / QR</span>
+                                  {paymentMethod === 'upi' && <div className="absolute top-2 right-2 w-4 h-4 rounded-full border-4 border-indigo-600 bg-white"></div>}
                               </button>
 
-                              <button className="flex items-center gap-4 p-4 border border-gray-200 hover:border-indigo-300 rounded-2xl text-left transition group opacity-60">
-                                  <div className="bg-gray-100 p-3 rounded-xl text-gray-500 group-hover:text-indigo-600 transition duration-300">
+                              <button 
+                                onClick={() => setPaymentMethod("card")}
+                                className={`flex flex-col items-center gap-3 p-4 border-2 rounded-2xl transition relative group ${paymentMethod === 'card' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
+                              >
+                                  <div className={`p-3 rounded-xl transition duration-300 ${paymentMethod === 'card' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
                                     <CreditCard size={24} />
                                   </div>
-                                  <div>
-                                    <p className="font-bold text-gray-900">Credit / Debit Card</p>
-                                    <p className="text-xs text-gray-500">Visa, Mastercard, AMEX, Discover</p>
-                                  </div>
-                              </button>
-
-                              <button className="flex items-center gap-4 p-4 border border-gray-200 hover:border-indigo-300 rounded-2xl text-left transition group opacity-60">
-                                  <div className="bg-gray-100 p-3 rounded-xl text-gray-500 group-hover:text-indigo-600 transition duration-300">
-                                    <BookOpen size={24} />
-                                  </div>
-                                  <div>
-                                    <p className="font-bold text-gray-900">Net Banking</p>
-                                    <p className="text-xs text-gray-500">All major banks supported</p>
-                                  </div>
+                                  <span className={`font-bold text-sm ${paymentMethod === 'card' ? 'text-indigo-900' : 'text-gray-500'}`}>Card</span>
+                                  {paymentMethod === 'card' && <div className="absolute top-2 right-2 w-4 h-4 rounded-full border-4 border-indigo-600 bg-white"></div>}
                               </button>
                           </div>
 
-                          {/* UPI QR Display */}
-                          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center">
-                              <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-4">
-                                  <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-900">
-                                      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-                                      <path d="M14 14h1M18 14h3M14 18h1M18 18h3M14 21h7M18 14v7M14 14v7" />
-                                      <rect x="6" y="6" width="1" height="1" /><rect x="17" y="6" width="1" height="1" /><rect x="6" y="17" width="1" height="1" />
-                                  </svg>
+                          {paymentMethod === "upi" ? (
+                              /* UPI QR Display */
+                              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center animate-in fade-in zoom-in-95">
+                                  <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-4">
+                                      <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-900">
+                                          <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                                          <path d="M14 14h1M18 14h3M14 18h1M18 18h3M14 21h7M18 14v7M14 14v7" />
+                                          <rect x="6" y="6" width="1" height="1" /><rect x="17" y="6" width="1" height="1" /><rect x="6" y="17" width="1" height="1" />
+                                      </svg>
+                                  </div>
+                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Scan QR to Pay</p>
+                                  <div className="flex gap-4 opacity-40">
+                                      <div className="h-4 w-10 bg-gray-400 rounded"></div>
+                                      <div className="h-4 w-10 bg-gray-400 rounded"></div>
+                                      <div className="h-4 w-10 bg-gray-400 rounded"></div>
+                                  </div>
                               </div>
-                              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Scan QR to Pay</p>
-                              <div className="flex gap-4 opacity-40">
-                                  <div className="h-4 w-10 bg-gray-400 rounded"></div>
-                                  <div className="h-4 w-10 bg-gray-400 rounded"></div>
-                                  <div className="h-4 w-10 bg-gray-400 rounded"></div>
+                          ) : (
+                              /* Card Form Display */
+                              <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
+                                  <div>
+                                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Card Number</label>
+                                      <div className="relative">
+                                          <CreditCard className="absolute left-4 top-3.5 text-gray-300" size={18} />
+                                          <input type="text" placeholder="0000 0000 0000 0000" className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
+                                      </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Expiry Date</label>
+                                          <input type="text" placeholder="MM / YY" className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
+                                      </div>
+                                      <div>
+                                          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">CVV</label>
+                                          <input type="password" placeholder="•••" className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium text-center" />
+                                      </div>
+                                  </div>
+                                  <div className="pt-2">
+                                      <label className="flex items-center gap-2 cursor-pointer group">
+                                          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                                          <span className="text-xs text-gray-500 group-hover:text-gray-700 transition">Save card for faster checkout</span>
+                                      </label>
+                                  </div>
                               </div>
-                          </div>
+                          )}
                       </div>
 
                       {/* Footer Action */}
