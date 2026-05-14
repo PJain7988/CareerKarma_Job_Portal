@@ -1,8 +1,44 @@
 import express from "express";
 import axios from "axios";
 import OpenAI from "openai";
+import multer from "multer";
+import pdfParse from "pdf-parse";
+import mammoth from "mammoth";
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
+router.post("/extract-text", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+    const buffer = req.file.buffer;
+    const mimetype = req.file.mimetype;
+    const originalname = req.file.originalname.toLowerCase();
+
+    let extractedText = "";
+
+    if (mimetype === "application/pdf" || originalname.endsWith(".pdf")) {
+      const data = await pdfParse(buffer);
+      extractedText = data.text;
+    } else if (
+      mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+      originalname.endsWith(".docx")
+    ) {
+      const result = await mammoth.extractRawText({ buffer });
+      extractedText = result.value;
+    } else if (mimetype === "text/plain" || originalname.endsWith(".txt")) {
+      extractedText = buffer.toString("utf-8");
+    } else {
+      return res.status(400).json({ error: "Unsupported file type. Please upload a PDF, DOCX, or TXT file." });
+    }
+
+    res.json({ text: extractedText.trim() });
+  } catch (err) {
+    console.error("❌ /extract-text error:", err);
+    res.status(500).json({ error: "Failed to extract text from file" });
+  }
+});
 
 async function askAI(messages) {
   // Use OpenAI if the key is available

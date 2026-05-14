@@ -14,6 +14,7 @@ const DEFAULT_MOCK_COURSES = [
 const LMS = () => {
   const [courses, setCourses] = useState([]);
   const [enrolledIds, setEnrolledIds] = useState([]);
+  const [completedIds, setCompletedIds] = useState([]);
   const [activeTab, setActiveTab] = useState("all"); 
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingCourse, setViewingCourse] = useState(null);
@@ -42,6 +43,11 @@ const LMS = () => {
       const savedEnrollments = localStorage.getItem(storageKey);
       if (savedEnrollments) setEnrolledIds(JSON.parse(savedEnrollments));
       else setEnrolledIds([]); // Reseting
+
+      const completedKey = `student_completed_${currentUserId}`;
+      const savedCompleted = localStorage.getItem(completedKey);
+      if (savedCompleted) setCompletedIds(JSON.parse(savedCompleted));
+      else setCompletedIds([]);
     };
 
     loadData();
@@ -61,13 +67,27 @@ const LMS = () => {
     const newEnrollments = [...enrolledIds, course.id];
     setEnrolledIds(newEnrollments);
     
-    
     if (userId) {
         localStorage.setItem(`student_enrollments_${userId}`, JSON.stringify(newEnrollments));
     }
     
     alert("Success! You are now enrolled.");
     setActiveTab("my");
+  };
+
+  const handleCompleteCourse = (courseId) => {
+    if (completedIds.includes(courseId)) {
+        // Toggle off
+        const newCompleted = completedIds.filter(id => id !== courseId);
+        setCompletedIds(newCompleted);
+        if (userId) localStorage.setItem(`student_completed_${userId}`, JSON.stringify(newCompleted));
+    } else {
+        // Toggle on
+        const newCompleted = [...completedIds, courseId];
+        setCompletedIds(newCompleted);
+        if (userId) localStorage.setItem(`student_completed_${userId}`, JSON.stringify(newCompleted));
+        alert("🎉 Congratulations on completing the course!");
+    }
   };
 
   const displayCourses = courses.filter(c => 
@@ -135,7 +155,17 @@ const LMS = () => {
                             ></iframe>
                         </div>
                         <div className="p-6 bg-gray-900 text-gray-300 flex-1 overflow-y-auto">
-                            <h3 className="text-white text-2xl font-bold mb-2">About this Course</h3>
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="text-white text-2xl font-bold">About this Course</h3>
+                                {enrolledIds.includes(viewingCourse.id) && (
+                                    <button 
+                                        onClick={() => handleCompleteCourse(viewingCourse.id)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all ${completedIds.includes(viewingCourse.id) ? "bg-green-500/20 text-green-400 border border-green-500/50" : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg"}`}
+                                    >
+                                        <CheckCircle size={16}/> {completedIds.includes(viewingCourse.id) ? "Completed" : "Mark as Complete"}
+                                    </button>
+                                )}
+                            </div>
                             <p className="leading-relaxed">{viewingCourse.description}</p>
                             <div className="mt-6 flex items-center gap-4 text-sm text-gray-400">
                                 <span className="flex items-center gap-1"><User size={16}/> Instructor: {viewingCourse.instructor}</span>
@@ -270,11 +300,16 @@ const LMS = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {displayCourses.map((course) => {
               const isEnrolled = enrolledIds.includes(course.id);
+              const isCompleted = completedIds.includes(course.id);
               return (
                 <div key={course.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-xl transition duration-300 flex flex-col border border-gray-100 group">
                     <div className="h-48 bg-gray-200 relative overflow-hidden flex items-center justify-center">
                         <img src={course.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt={course.title} onError={(e) => e.target.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}/>
-                        {isEnrolled && <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow flex items-center gap-1"><CheckCircle size={12} /> Enrolled</div>}
+                        {isEnrolled && (
+                            <div className={`absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full shadow flex items-center gap-1 ${isCompleted ? "bg-purple-500" : "bg-green-500"}`}>
+                                <CheckCircle size={12} /> {isCompleted ? "Completed" : "Enrolled"}
+                            </div>
+                        )}
                     </div>
                     <div className="p-6 flex-1 flex flex-col">
                         <h3 className="font-bold text-xl text-gray-900 mb-1 line-clamp-1">{course.title}</h3>
@@ -284,8 +319,8 @@ const LMS = () => {
                                 <span className="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">{course.price || "Free"}</span>
                                 <span className="flex items-center gap-1 text-gray-400"><Clock size={14}/> {course.duration}</span>
                             </div>
-                            <button onClick={() => handleEnroll(course)} className={`px-5 py-2 rounded-lg font-semibold text-sm transition shadow-sm ${isEnrolled ? "bg-gray-900 text-white hover:bg-black" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}>
-                                {isEnrolled ? "Continue" : "Enroll"}
+                            <button onClick={() => handleEnroll(course)} className={`px-5 py-2 rounded-lg font-semibold text-sm transition shadow-sm ${isCompleted ? "bg-purple-100 text-purple-700 hover:bg-purple-200" : isEnrolled ? "bg-gray-900 text-white hover:bg-black" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}>
+                                {isCompleted ? "Review" : isEnrolled ? "Continue" : "Enroll"}
                             </button>
                         </div>
                     </div>

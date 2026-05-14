@@ -51,18 +51,35 @@ export default function ResumeAnalyzer() {
     }
   };
 
-  const handleFileUpload = (e) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      setResumeText(evt.target.result);
-    };
-    reader.onerror = () => {
-      alert("Error reading file");
-    };
-    reader.readAsText(file);
+    if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+        const reader = new FileReader();
+        reader.onload = (evt) => setResumeText(evt.target.result);
+        reader.onerror = () => alert("Error reading file");
+        reader.readAsText(file);
+        return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const { data } = await api.post("/ai/extract-text", formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        });
+        setResumeText(data.text);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to extract text from file. Please ensure it is a valid PDF or DOCX.");
+    } finally {
+        setUploading(false);
+    }
   };
 
   const reset = () => {
@@ -95,18 +112,20 @@ export default function ResumeAnalyzer() {
                 <div className="flex flex-col">
                     <div className="flex items-center justify-between mb-3">
                         <label className="flex items-center gap-2 text-sm font-bold text-gray-800 uppercase tracking-wider">
-                            <FileText size={18} className="text-indigo-600"/> 1. Paste Resume Content
+                            <FileText size={18} className="text-indigo-600"/> 1. Paste or Upload Resume
                         </label>
-                        <div className="relative overflow-hidden cursor-pointer">
-                            <button className="flex items-center gap-1 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
-                                <UploadCloud size={14}/> Upload .txt
+                        <div className="relative overflow-hidden cursor-pointer group">
+                            <button disabled={uploading} className="flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-100 hover:bg-indigo-200 px-4 py-2 rounded-lg transition shadow-sm group-hover:shadow-md disabled:opacity-50">
+                                {uploading ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16}/>} 
+                                {uploading ? "Extracting..." : "Upload File (PDF/DOCX/TXT)"}
                             </button>
                             <input 
                                 type="file" 
-                                accept=".txt" 
+                                accept=".txt,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
                                 onChange={handleFileUpload} 
-                                className="absolute inset-0 opacity-0 cursor-pointer"
-                                title="Upload text resume"
+                                disabled={uploading}
+                                className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                                title="Upload resume file"
                             />
                         </div>
                     </div>
