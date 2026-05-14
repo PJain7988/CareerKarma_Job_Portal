@@ -56,6 +56,50 @@ const sendOTPEmail = async (email, otp) => {
   }
 };
 
+const sendResetEmail = async (email, otp) => {
+  try {
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        to: [{ email: email }],
+        sender: { 
+          name: "CareerKarma",
+          email: process.env.BREVO_EMAIL || "72062priya@gmail.com"
+        },
+        subject: "Reset your password - CareerKarma",
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <h2 style="color: #6366f1; text-align: center;">Password Reset Request</h2>
+            <p style="font-size: 16px; color: #444;">
+              You requested to reset your password. Use the following OTP to proceed:
+            </p>
+            <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+              <h1 style="color: #4f46e5; letter-spacing: 8px; margin: 0; font-size: 32px;">${otp}</h1>
+            </div>
+            <p style="color: #666; font-size: 14px; line-height: 1.5;">
+              This code is valid for 10 minutes. If you did not request this, please ignore this email or contact support if you have concerns.
+            </p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="color: #999; font-size: 12px; text-align: center;">
+              &copy; ${new Date().getFullYear()} CareerKarma. All rights reserved.
+            </p>
+          </div>
+        `,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return true;
+  } catch (error) {
+    console.error("❌ Reset Email failed:", error.message);
+    return false;
+  }
+};
+
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -211,6 +255,64 @@ router.post("/resend-otp", async (req, res) => {
     res.json({ message: "OTP resent to email" });
   } catch (e) {
     console.error("❌ Resend OTP error:", e.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// FORGOT PASSWORD
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      // For security, don't reveal if user exists, but here we'll be helpful for now
+      return res.status(404).json({ error: "User not found with this email" });
+    }
+
+    const otp = generateOTP();
+    user.verificationToken = otp;
+    user.verificationTokenExpiry = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    await sendResetEmail(normalizedEmail, otp);
+
+    res.json({ message: "OTP sent to your email" });
+  } catch (e) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// RESET PASSWORD
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const user = await User.findOne({ 
+        email: email.trim().toLowerCase(),
+        verificationToken: otp 
+    });
+
+    if (!user) return res.status(400).json({ error: "Invalid OTP or email" });
+
+    if (user.verificationTokenExpiry < Date.now()) {
+      return res.status(400).json({ error: "OTP expired" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.passwordHash = hashedPassword;
+    user.verificationToken = null;
+    user.verificationTokenExpiry = null;
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (e) {
     res.status(500).json({ error: "Server error" });
   }
 });

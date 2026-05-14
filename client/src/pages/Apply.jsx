@@ -100,7 +100,7 @@ export default function Apply() {
   }
 
   async function analyze() {
-    if (!formData.resumeText) {
+    if (!applicationData.resumeText) {
       alert("Please paste your resume text below to analyze.");
       return;
     }
