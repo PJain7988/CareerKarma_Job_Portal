@@ -147,7 +147,7 @@ const LMS = () => {
                         <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                             <iframe 
                                 className="absolute inset-0 w-full h-full" 
-                                src="https://www.youtube.com/embed/jBzwzrDvZ18?autoplay=1" 
+                                src={viewingCourse.videoUrl || "https://www.youtube.com/embed/jBzwzrDvZ18?autoplay=1"} 
                                 title="Course Video" 
                                 frameBorder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
