@@ -362,12 +362,8 @@ const LMS = () => {
                   <div className="bg-indigo-900 text-white w-full md:w-1/3 p-6 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-8">
-                            <div className="bg-white p-1.5 rounded-lg">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#312E81"/>
-                                    <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                            <div className="bg-white p-1 rounded-lg">
+                                <DollarSign size={20} className="text-indigo-900" />
                             </div>
                             <span className="font-bold text-xl tracking-wide">Razorpay</span>
                         </div>
@@ -397,34 +393,29 @@ const LMS = () => {
                           {/* Tabs or Options (Simulated UPI/QR) */}
                           <div className="grid grid-cols-2 gap-4 mb-6">
                               <button className="flex flex-col items-center justify-center p-4 border-2 border-indigo-600 bg-indigo-50 rounded-xl text-indigo-700 transition">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                                  <div className="mb-2 bg-indigo-100 p-2 rounded-lg">
+                                    <Search size={20} />
+                                  </div>
                                   <span className="font-bold text-sm">UPI / QR</span>
                               </button>
                               <button className="flex flex-col items-center justify-center p-4 border border-gray-200 hover:border-gray-300 rounded-xl text-gray-600 transition opacity-50 cursor-not-allowed">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                  <div className="mb-2 bg-gray-100 p-2 rounded-lg">
+                                    <PlayCircle size={20} />
+                                  </div>
                                   <span className="font-bold text-sm">Card</span>
                               </button>
                           </div>
 
-                          {/* Active Content: QR Code */}
+                          {/* Active Content: QR Code Placeholder */}
                           <div className="text-center animate-in fade-in flex flex-col items-center justify-center h-full">
                               <p className="text-sm text-gray-600 mb-4 font-medium">Scan with any UPI App</p>
-                              <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 inline-block">
-                                  {/* Simulated QR Code using nested divs to look like a QR */}
-                                  <div className="w-40 h-40 grid grid-cols-5 grid-rows-5 gap-1 p-2 bg-black rounded-lg">
-                                      <div className="bg-white rounded-tl-md row-span-2 col-span-2 relative"><div className="absolute inset-1.5 bg-black rounded-sm"></div></div>
-                                      <div className="bg-white col-span-1 row-span-1"></div>
-                                      <div className="bg-white rounded-tr-md row-span-2 col-span-2 relative"><div className="absolute inset-1.5 bg-black rounded-sm"></div></div>
-                                      <div className="bg-white col-span-1 row-span-3"></div>
-                                      <div className="bg-white col-span-2 row-span-1"></div>
-                                      <div className="bg-white rounded-bl-md row-span-2 col-span-2 relative"><div className="absolute inset-1.5 bg-black rounded-sm"></div></div>
-                                      <div className="bg-white col-span-2 row-span-2"></div>
-                                      <div className="bg-white rounded-br-md row-span-1 col-span-1 relative"></div>
-                                  </div>
+                              <div className="bg-gray-100 p-8 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                  <div className="w-24 h-24 bg-gray-200 rounded flex items-center justify-center text-gray-400 font-bold text-xs">QR CODE</div>
                               </div>
                               <div className="flex justify-center gap-4 mt-6">
-                                  <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-4 opacity-50" />
-                                  <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Google_Pay_logo.svg" alt="GPay" className="h-4 opacity-50" />
+                                  <span className="text-xs font-bold text-gray-400">BHIM</span>
+                                  <span className="text-xs font-bold text-gray-400">GPAY</span>
+                                  <span className="text-xs font-bold text-gray-400">PHONEPE</span>
                               </div>
                           </div>
                       </div>

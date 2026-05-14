@@ -55,7 +55,11 @@ const JobDetailModal = ({ job, onClose, onApply, hasApplied }) => {
             <div className="flex items-center gap-2"><MapPin size={16} className="text-gray-400"/> {job.location}</div>
             <div className="flex items-center gap-2"><Briefcase size={16} className="text-gray-400"/> {job.salary}</div>
             <div className="flex items-center gap-2"><Mail size={16} className="text-gray-400"/> {job.hrEmail || "hr@company.com"}</div>
-            <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400"/> Posted {new Date(job.createdAt).toLocaleDateString()}</div>
+            {job.deadline ? (
+                <div className="flex items-center gap-2 text-red-600 font-bold"><Clock size={16} className="text-red-500"/> Apply by: {new Date(job.deadline).toLocaleDateString()}</div>
+            ) : (
+                <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400"/> Posted {new Date(job.createdAt).toLocaleDateString()}</div>
+            )}
         </div>
 
         <hr className="my-6 border-gray-200" />
@@ -87,7 +91,7 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [formData, setFormData] = useState({
+  const [applicationData, setApplicationData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -99,7 +103,7 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setApplicationData(prev => ({ ...prev, [name]: value }));
   };
 
   const analyze = async () => {
@@ -151,23 +155,23 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">First Name *</label>
-                    <input required type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="John" />
+                    <input required type="text" name="firstName" value={applicationData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="John" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Last Name *</label>
-                    <input required type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Doe" />
+                    <input required type="text" name="lastName" value={applicationData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Doe" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Email Address *</label>
-                    <input required type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="john@example.com" />
+                    <input required type="email" name="email" value={applicationData.email} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="john@example.com" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Phone Number</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="+1 (555) 000-0000" />
+                    <input type="tel" name="phone" value={applicationData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="+1 (555) 000-0000" />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">LinkedIn Profile</label>
-                    <input type="url" name="linkedin" value={formData.linkedin} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://linkedin.com/in/johndoe" />
+                    <input type="url" name="linkedin" value={applicationData.linkedin} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://linkedin.com/in/johndoe" />
                   </div>
                 </div>
               </div>
@@ -250,7 +254,7 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
         
         <div className="bg-gray-50 px-6 py-4 border-t flex justify-end gap-3 shrink-0">
             <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-100 transition">Cancel</button>
-            <button type="submit" form="apply-form" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition shadow-md disabled:opacity-70 flex items-center gap-2">
+            <button type="submit" form="apply-form" onClick={() => onSubmit(job, coverLetter, resumeText, resumeFile, applicationData)} disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition shadow-md disabled:opacity-70 flex items-center gap-2">
                 {isSubmitting ? (
                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Submitting...</>
                 ) : "Submit Application"}
@@ -566,7 +570,12 @@ export default function Jobs() {
                   </div>
                   <span className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded font-semibold whitespace-nowrap">{job.type}</span>
                 </div>
-                <div className="text-gray-500 text-sm flex items-center gap-1 mb-3"><MapPin size={14} /> {job.location}</div>
+                <div className="flex justify-between items-center mb-3">
+                    <div className="text-gray-500 text-sm flex items-center gap-1"><MapPin size={14} /> {job.location}</div>
+                    {job.deadline && (
+                        <div className="text-red-600 text-xs font-bold flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded-md"><Clock size={12} /> Apply by {new Date(job.deadline).toLocaleDateString()}</div>
+                    )}
+                </div>
                 <div className="text-gray-600 text-sm mb-4 line-clamp-2">{job.description.slice(0, 100)}...</div>
                 
                 <div className="mt-auto pt-4 border-t flex items-center justify-between gap-2">
