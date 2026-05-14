@@ -172,7 +172,15 @@ const LMS = () => {
                         <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                             <iframe 
                                 className="absolute inset-0 w-full h-full" 
-                                src={viewingCourse.videoUrl || "https://www.youtube.com/embed/jBzwzrDvZ18?autoplay=1"} 
+                                src={viewingCourse.videoUrl || (
+                                    viewingCourse.category === "Data Science" ? "https://www.youtube.com/embed/rfscVS0vtbw" :
+                                    viewingCourse.category === "Marketing" ? "https://www.youtube.com/embed/z6m5n9LzN7s" :
+                                    viewingCourse.category === "Design" ? "https://www.youtube.com/embed/c9Wg6ndoxag" :
+                                    viewingCourse.category === "AI" ? "https://www.youtube.com/embed/GwIo3gDZCVQ" :
+                                    viewingCourse.category === "DevOps" ? "https://www.youtube.com/embed/fqMOX6JJhGo" :
+                                    viewingCourse.category === "Finance" ? "https://www.youtube.com/embed/WEd_mXAn9H8" :
+                                    "https://www.youtube.com/embed/jBzwzrDvZ18"
+                                ) + "?autoplay=1"} 
                                 title="Course Video" 
                                 frameBorder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -426,73 +434,75 @@ const LMS = () => {
 
                       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                           {/* Payment Methods Grid */}
-                          <div className="grid grid-cols-2 gap-3 mb-8">
-                              <button 
-                                onClick={() => setPaymentMethod("upi")}
-                                className={`flex flex-col items-center gap-3 p-4 border-2 rounded-2xl transition relative group ${paymentMethod === 'upi' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
-                              >
-                                  <div className={`p-3 rounded-xl transition duration-300 ${paymentMethod === 'upi' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
-                                    <Smartphone size={24} />
-                                  </div>
-                                  <span className={`font-bold text-sm ${paymentMethod === 'upi' ? 'text-indigo-900' : 'text-gray-500'}`}>UPI / QR</span>
-                                  {paymentMethod === 'upi' && <div className="absolute top-2 right-2 w-4 h-4 rounded-full border-4 border-indigo-600 bg-white"></div>}
-                              </button>
-
-                              <button 
-                                onClick={() => setPaymentMethod("card")}
-                                className={`flex flex-col items-center gap-3 p-4 border-2 rounded-2xl transition relative group ${paymentMethod === 'card' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
-                              >
-                                  <div className={`p-3 rounded-xl transition duration-300 ${paymentMethod === 'card' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
-                                    <CreditCard size={24} />
-                                  </div>
-                                  <span className={`font-bold text-sm ${paymentMethod === 'card' ? 'text-indigo-900' : 'text-gray-500'}`}>Card</span>
-                                  {paymentMethod === 'card' && <div className="absolute top-2 right-2 w-4 h-4 rounded-full border-4 border-indigo-600 bg-white"></div>}
-                              </button>
+                          <div className="grid grid-cols-4 gap-2 mb-6">
+                              {[
+                                { id: 'upi', icon: Smartphone, label: 'UPI' },
+                                { id: 'card', icon: CreditCard, label: 'Card' },
+                                { id: 'net', icon: BookOpen, label: 'Bank' },
+                                { id: 'wallet', icon: Star, label: 'Wallet' }
+                              ].map((method) => (
+                                <button 
+                                  key={method.id}
+                                  onClick={() => setPaymentMethod(method.id)}
+                                  className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition relative group ${paymentMethod === method.id ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
+                                >
+                                    <div className={`p-2 rounded-lg transition duration-300 ${paymentMethod === method.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
+                                      <method.icon size={20} />
+                                    </div>
+                                    <span className={`font-bold text-[10px] ${paymentMethod === method.id ? 'text-indigo-900' : 'text-gray-500'}`}>{method.label}</span>
+                                </button>
+                              ))}
                           </div>
 
-                          {paymentMethod === "upi" ? (
-                              /* UPI QR Display */
+                          {paymentMethod === "upi" && (
                               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center animate-in fade-in zoom-in-95">
                                   <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-4">
-                                      <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-900">
+                                      <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-900">
                                           <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                                           <path d="M14 14h1M18 14h3M14 18h1M18 18h3M14 21h7M18 14v7M14 14v7" />
                                           <rect x="6" y="6" width="1" height="1" /><rect x="17" y="6" width="1" height="1" /><rect x="6" y="17" width="1" height="1" />
                                       </svg>
                                   </div>
-                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Scan QR to Pay</p>
-                                  <div className="flex gap-4 opacity-40">
-                                      <div className="h-4 w-10 bg-gray-400 rounded"></div>
-                                      <div className="h-4 w-10 bg-gray-400 rounded"></div>
-                                      <div className="h-4 w-10 bg-gray-400 rounded"></div>
-                                  </div>
+                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Scan QR to Pay</p>
                               </div>
-                          ) : (
-                              /* Card Form Display */
+                          )}
+
+                          {paymentMethod === "card" && (
                               <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
                                   <div>
                                       <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Card Number</label>
-                                      <div className="relative">
-                                          <CreditCard className="absolute left-4 top-3.5 text-gray-300" size={18} />
-                                          <input type="text" placeholder="0000 0000 0000 0000" className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
-                                      </div>
+                                      <input type="text" placeholder="0000 0000 0000 0000" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
                                   </div>
                                   <div className="grid grid-cols-2 gap-4">
-                                      <div>
-                                          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Expiry Date</label>
-                                          <input type="text" placeholder="MM / YY" className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
-                                      </div>
-                                      <div>
-                                          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">CVV</label>
-                                          <input type="password" placeholder="•••" className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium text-center" />
-                                      </div>
+                                      <input type="text" placeholder="MM / YY" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
+                                      <input type="password" placeholder="CVV" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
                                   </div>
-                                  <div className="pt-2">
-                                      <label className="flex items-center gap-2 cursor-pointer group">
-                                          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                          <span className="text-xs text-gray-500 group-hover:text-gray-700 transition">Save card for faster checkout</span>
-                                      </label>
+                              </div>
+                          )}
+
+                          {paymentMethod === "net" && (
+                              <div className="space-y-3 animate-in fade-in slide-in-from-right-4">
+                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Popular Banks</p>
+                                  <div className="grid grid-cols-2 gap-2">
+                                      {['SBI', 'HDFC', 'ICICI', 'Axis'].map(bank => (
+                                          <button key={bank} className="p-3 border border-gray-100 rounded-xl text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:border-indigo-200 transition">{bank}</button>
+                                      ))}
                                   </div>
+                                  <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none">
+                                      <option>Other Banks</option>
+                                  </select>
+                              </div>
+                          )}
+
+                          {paymentMethod === "wallet" && (
+                              <div className="space-y-3 animate-in fade-in slide-in-from-right-4">
+                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Wallet</p>
+                                  {['Paytm', 'PhonePe', 'Amazon Pay', 'MobiKwik'].map(wallet => (
+                                      <button key={wallet} className="w-full p-3 border border-gray-100 rounded-xl text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:border-indigo-200 transition text-left flex items-center justify-between">
+                                          {wallet}
+                                          <div className="w-4 h-4 rounded-full border border-gray-300"></div>
+                                      </button>
+                                  ))}
                               </div>
                           )}
                       </div>
