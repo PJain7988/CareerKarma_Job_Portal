@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download, Sparkles, Loader2, Lock } from "lucide-react";
+import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download, Sparkles, Loader2, Lock, Smartphone, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
@@ -357,90 +357,141 @@ const LMS = () => {
 
       {/* Razorpay Style Payment Gateway Modal */}
       {showPaymentModal && paymentCourse && (
-          <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-[110] p-4 font-sans">
-              <div className="bg-white rounded-xl w-full max-w-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col md:flex-row h-auto md:h-[500px]">
-                  
-                  {/* Left Sidebar (Razorpay Branding / Summary) */}
-                  <div className="bg-indigo-900 text-white w-full md:w-1/3 p-6 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-8">
-                            <div className="bg-white p-1 rounded-lg">
-                                <DollarSign size={20} className="text-indigo-900" />
+          <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[200] p-4 font-sans">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="bg-white rounded-2xl w-full max-w-4xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row h-auto md:h-[550px]"
+              >
+                  {/* Left Sidebar (Branding & Summary) */}
+                  <div className="bg-[#1a1f36] text-white w-full md:w-[35%] p-8 flex flex-col justify-between relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                        <div className="absolute top-[-50px] right-[-50px] w-48 h-48 rounded-full bg-indigo-500 blur-3xl"></div>
+                        <div className="absolute bottom-[-50px] left-[-50px] w-48 h-48 rounded-full bg-purple-500 blur-3xl"></div>
+                      </div>
+
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-10">
+                            <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-900/50">
+                                <DollarSign size={24} className="text-white" />
                             </div>
-                            <span className="font-bold text-xl tracking-wide">Razorpay</span>
+                            <span className="font-extrabold text-2xl tracking-tight">PayGateway</span>
                         </div>
-                        <p className="text-indigo-200 text-sm mb-1 uppercase tracking-wider font-bold">Payment for</p>
-                        <h3 className="text-xl font-bold mb-6 leading-tight">{paymentCourse.title}</h3>
                         
-                        <div className="bg-indigo-800/50 p-4 rounded-xl border border-indigo-700/50">
-                            <p className="text-indigo-200 text-sm">Amount to pay</p>
-                            <p className="text-3xl font-black mt-1">{paymentCourse.price}</p>
+                        <div className="space-y-6">
+                          <div>
+                            <p className="text-indigo-300 text-[10px] uppercase tracking-[2px] font-bold mb-1">Item Details</p>
+                            <h3 className="text-xl font-bold leading-tight">{paymentCourse.title}</h3>
+                            <p className="text-indigo-400 text-xs mt-1">Professional Certification Program</p>
+                          </div>
+
+                          <div className="h-px bg-indigo-800/50 w-full"></div>
+
+                          <div>
+                            <p className="text-indigo-300 text-[10px] uppercase tracking-[2px] font-bold mb-1">Total Amount</p>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-4xl font-black">{paymentCourse.price}</span>
+                                <span className="text-indigo-400 text-xs font-medium">USD</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="mt-8 text-xs text-indigo-300 flex items-center gap-2">
-                          <Lock size={12}/> Secured by Razorpay
+                      <div className="relative z-10 pt-8 border-t border-indigo-800/50">
+                          <div className="flex items-center gap-3 text-indigo-300 text-xs">
+                              <div className="bg-green-500/20 p-1.5 rounded-full">
+                                <Lock size={14} className="text-green-400"/>
+                              </div>
+                              <p className="font-medium">Bank-level 256-bit SSL Security</p>
+                          </div>
+                          <p className="text-[10px] text-indigo-500 mt-4 text-center">By continuing, you agree to our Terms of Service</p>
                       </div>
                   </div>
 
                   {/* Right Content Area */}
-                  <div className="flex-1 bg-white p-6 md:p-8 flex flex-col relative overflow-y-auto">
-                      <button onClick={() => !processingPayment && setShowPaymentModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition disabled:opacity-50" disabled={processingPayment}>
+                  <div className="flex-1 bg-white p-6 md:p-10 flex flex-col relative">
+                      <button 
+                        onClick={() => !processingPayment && setShowPaymentModal(false)} 
+                        className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition disabled:opacity-50" 
+                        disabled={processingPayment}
+                      >
                           <X size={20}/>
                       </button>
 
-                      <h2 className="text-lg font-bold text-gray-800 mb-6 border-b pb-3">Select Payment Method</h2>
+                      <div className="mb-8">
+                        <h2 className="text-2xl font-black text-gray-900 mb-1">Payment Method</h2>
+                        <p className="text-sm text-gray-500">Choose how you'd like to pay for your course</p>
+                      </div>
 
-                      <div className="flex-1">
-                          {/* Tabs or Options (Simulated UPI/QR) */}
-                          <div className="grid grid-cols-2 gap-4 mb-6">
-                              <button className="flex flex-col items-center justify-center p-4 border-2 border-indigo-600 bg-indigo-50 rounded-xl text-indigo-700 transition">
-                                  <div className="mb-2 bg-indigo-100 p-2 rounded-lg">
-                                    <Search size={20} />
+                      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                          {/* Payment Methods Grid */}
+                          <div className="grid grid-cols-1 gap-3 mb-8">
+                              <button className="flex items-center gap-4 p-4 border-2 border-indigo-600 bg-indigo-50/50 rounded-2xl text-left transition relative group">
+                                  <div className="bg-indigo-100 p-3 rounded-xl text-indigo-600 group-hover:scale-110 transition duration-300">
+                                    <Smartphone size={24} />
                                   </div>
-                                  <span className="font-bold text-sm">UPI / QR</span>
+                                  <div>
+                                    <p className="font-bold text-gray-900">UPI / QR Code</p>
+                                    <p className="text-xs text-gray-500">GPay, PhonePe, Paytm, and more</p>
+                                  </div>
+                                  <div className="ml-auto w-5 h-5 rounded-full border-4 border-indigo-600 bg-white"></div>
                               </button>
-                              <button className="flex flex-col items-center justify-center p-4 border border-gray-200 hover:border-gray-300 rounded-xl text-gray-600 transition opacity-50 cursor-not-allowed">
-                                  <div className="mb-2 bg-gray-100 p-2 rounded-lg">
-                                    <PlayCircle size={20} />
+
+                              <button className="flex items-center gap-4 p-4 border border-gray-200 hover:border-indigo-300 rounded-2xl text-left transition group opacity-60">
+                                  <div className="bg-gray-100 p-3 rounded-xl text-gray-500 group-hover:text-indigo-600 transition duration-300">
+                                    <CreditCard size={24} />
                                   </div>
-                                  <span className="font-bold text-sm">Card</span>
+                                  <div>
+                                    <p className="font-bold text-gray-900">Credit / Debit Card</p>
+                                    <p className="text-xs text-gray-500">Visa, Mastercard, AMEX, Discover</p>
+                                  </div>
+                              </button>
+
+                              <button className="flex items-center gap-4 p-4 border border-gray-200 hover:border-indigo-300 rounded-2xl text-left transition group opacity-60">
+                                  <div className="bg-gray-100 p-3 rounded-xl text-gray-500 group-hover:text-indigo-600 transition duration-300">
+                                    <BookOpen size={24} />
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-gray-900">Net Banking</p>
+                                    <p className="text-xs text-gray-500">All major banks supported</p>
+                                  </div>
                               </button>
                           </div>
 
-                          {/* Active Content: QR Code Placeholder */}
-                          <div className="text-center animate-in fade-in flex flex-col items-center justify-center h-full">
-                              <p className="text-sm text-gray-600 mb-4 font-medium">Scan with any UPI App</p>
-                              <div className="bg-white p-4 rounded-2xl border-2 border-indigo-100 shadow-inner flex items-center justify-center relative group">
-                                  <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
+                          {/* UPI QR Display */}
+                          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center">
+                              <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-4">
+                                  <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-900">
                                       <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                                       <path d="M14 14h1M18 14h3M14 18h1M18 18h3M14 21h7M18 14v7M14 14v7" />
                                       <rect x="6" y="6" width="1" height="1" /><rect x="17" y="6" width="1" height="1" /><rect x="6" y="17" width="1" height="1" />
                                   </svg>
-                                  <div className="absolute inset-0 flex items-center justify-center bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <Sparkles className="text-indigo-600 animate-pulse" size={40} />
-                                  </div>
                               </div>
-                              <div className="flex justify-center gap-6 mt-6 grayscale opacity-60">
-                                  <span className="text-[10px] font-black tracking-tighter border border-gray-300 px-2 py-0.5 rounded">BHIM</span>
-                                  <span className="text-[10px] font-black tracking-tighter border border-gray-300 px-2 py-0.5 rounded italic">GPay</span>
-                                  <span className="text-[10px] font-black tracking-tighter border border-gray-300 px-2 py-0.5 rounded">PhonePe</span>
+                              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Scan QR to Pay</p>
+                              <div className="flex gap-4 opacity-40">
+                                  <div className="h-4 w-10 bg-gray-400 rounded"></div>
+                                  <div className="h-4 w-10 bg-gray-400 rounded"></div>
+                                  <div className="h-4 w-10 bg-gray-400 rounded"></div>
                               </div>
                           </div>
                       </div>
 
-                      {/* Action Button */}
-                      <div className="mt-auto pt-6 border-t border-gray-100">
+                      {/* Footer Action */}
+                      <div className="mt-8 pt-6 border-t border-gray-100">
                           <button 
                               onClick={handlePaymentSubmit} 
                               disabled={processingPayment} 
-                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-100 transition flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed group active:scale-95"
                           >
-                              {processingPayment ? <><Loader2 size={20} className="animate-spin"/> Processing Payment...</> : `Simulate Successful Payment`}
+                              {processingPayment ? (
+                                <><Loader2 size={20} className="animate-spin"/> Processing Payment...</>
+                              ) : (
+                                <><CheckCircle size={20} className="group-hover:scale-110 transition"/> Pay Now</>
+                              )}
                           </button>
                       </div>
                   </div>
-              </div>
+              </motion.div>
           </div>
       )}
 
