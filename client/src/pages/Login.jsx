@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api, { setAuth } from "../services/api";
 import { X, Key, Mail, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,9 +10,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(error, );
-  })
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -157,8 +156,6 @@ export default function Login() {
 
             {/* FORGOT PASSWORD LINK */}
             <div className="flex justify-end">
-                <button 
-                    type="button" 
                 <button 
                     type="button" 
                     onClick={() => setShowForgotModal(true)}
