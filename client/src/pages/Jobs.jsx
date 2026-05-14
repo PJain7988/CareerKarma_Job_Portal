@@ -427,9 +427,9 @@ export default function Jobs() {
     let resumeFilename = "";
     try {
       if (resumeFile) {
-        const formData = new FormData();
-        formData.append("resume", resumeFile);
-        const uploadRes = await axios.post(`${BACKEND_URL}/api/jobs/upload-resume`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        const jobApplicationFormData = new FormData();
+        jobApplicationFormData.append("resume", resumeFile);
+        const uploadRes = await axios.post(`${BACKEND_URL}/api/jobs/upload-resume`, jobApplicationFormData, { headers: { "Content-Type": "multipart/form-data" } });
         resumeFilename = (uploadRes.data.filePath || "").split(/[/\\]/).pop(); 
       }
       if (job.isLocal) {

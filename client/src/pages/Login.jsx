@@ -5,14 +5,14 @@ import { X, Key, Mail, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loginFormData, setLoginFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setLoginFormData({ ...loginFormData, [e.target.name]: e.target.value });
   };
 
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -25,6 +25,9 @@ export default function Login() {
 
   const handleRequestOTP = async (e) => {
     e.preventDefault();
+    if (!forgotEmail.trim()) {
+        return setForgotError("Please enter your email address.");
+    }
     setForgotLoading(true);
     setForgotError("");
     try {
@@ -38,6 +41,9 @@ export default function Login() {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+    if (!forgotData.otp || !forgotData.newPassword || !forgotData.confirmPassword) {
+        return setForgotError("Please fill in all fields.");
+    }
     if (forgotData.newPassword !== forgotData.confirmPassword) {
         return setForgotError("Passwords do not match.");
     }
@@ -68,8 +74,8 @@ export default function Login() {
 
     try {
       const payload = {
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
+        email: loginFormData.email.trim().toLowerCase(),
+        password: loginFormData.password,
       };
 
       const res = await api.post("/auth/login", payload);
@@ -132,7 +138,7 @@ export default function Login() {
                 type="email"
                 name="email"
                 placeholder="Enter your email"
-                value={formData.email}
+                value={loginFormData.email}
                 onChange={handleChange}
                 required
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
@@ -147,7 +153,7 @@ export default function Login() {
                 type="password"
                 name="password"
                 placeholder="Enter your password"
-                value={formData.password}
+                value={loginFormData.password}
                 onChange={handleChange}
                 required
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
@@ -249,7 +255,7 @@ export default function Login() {
 
                 {forgotStep === 1 ? (
                   /* Step 1: Email Form */
-                  <form onSubmit={handleRequestOTP} className="space-y-4">
+                  <form onSubmit={handleRequestOTP} noValidate className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Email Address</label>
                       <div className="relative">
@@ -266,8 +272,8 @@ export default function Login() {
                     </div>
                     <button
                       type="submit"
-                      disabled={forgotLoading}
-                      className="w-full bg-purple-600 text-white py-4 rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 transition font-bold flex items-center justify-center gap-2 disabled:opacity-70"
+                      disabled={forgotLoading || !forgotEmail.trim()}
+                      className="w-full bg-purple-600 text-white py-4 rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 transition font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {forgotLoading ? <Loader2 className="animate-spin" size={20} /> : "Send Reset Code"}
                       {!forgotLoading && <ArrowRight size={18} />}
@@ -275,7 +281,7 @@ export default function Login() {
                   </form>
                 ) : (
                   /* Step 2: OTP & New Password Form */
-                  <form onSubmit={handleResetPassword} className="space-y-4">
+                  <form onSubmit={handleResetPassword} noValidate className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">6-Digit Code</label>
                       <input
@@ -318,8 +324,8 @@ export default function Login() {
                     </div>
                     <button
                       type="submit"
-                      disabled={forgotLoading || forgotSuccess}
-                      className="w-full bg-purple-600 text-white py-4 rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 transition font-bold flex items-center justify-center gap-2 disabled:opacity-70"
+                      disabled={forgotLoading || forgotSuccess || !forgotData.otp || !forgotData.newPassword || !forgotData.confirmPassword}
+                      className="w-full bg-purple-600 text-white py-4 rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 transition font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {forgotLoading ? <Loader2 className="animate-spin" size={20} /> : "Reset Password"}
                     </button>

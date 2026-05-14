@@ -69,11 +69,11 @@ export default function ResumeAnalyzer() {
     }
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+    const analysisFormData = new FormData();
+    analysisFormData.append("file", file);
 
     try {
-        const { data } = await api.post("/ai/extract-text", formData, {
+        const { data } = await api.post("/ai/extract-text", analysisFormData, {
             headers: { "Content-Type": "multipart/form-data" }
         });
         setResumeText(data.text);

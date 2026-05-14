@@ -11,14 +11,14 @@ const CourseManagement = () => {
   const [showEnrollModal, setShowEnrollModal] = useState(false); 
   const [enrollments, setEnrollments] = useState([]); 
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ title: "", instructor: "", price: "", duration: "", image: "", videoUrl: "", description: "", status: "Draft" });
+  const [courseFormData, setCourseFormData] = useState({ title: "", instructor: "", price: "", duration: "", image: "", videoUrl: "", description: "", status: "Draft" });
 
   useEffect(() => { localStorage.setItem("hr_courses", JSON.stringify(courses)); }, [courses]);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setCourseFormData({ ...courseFormData, [e.target.name]: e.target.value });
   const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = { ...formData, image: formData.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800" };
+    const payload = { ...courseFormData, image: courseFormData.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800" };
     if (editingId) setCourses(courses.map(c => c.id === editingId ? { ...payload, id: editingId } : c));
     else setCourses([{ ...payload, id: Date.now() }, ...courses]);
     setShowModal(false);
@@ -40,7 +40,7 @@ const CourseManagement = () => {
             <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3"><BookOpen className="text-indigo-600" size={32}/> Course Management</h1>
             <p className="text-gray-500 mt-1">Create and manage your educational content.</p>
           </div>
-          <button onClick={() => { setEditingId(null); setFormData({ title: "", instructor: "", price: "", duration: "", image: "", videoUrl: "", description: "", status: "Draft" }); setShowModal(true); }} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition flex items-center gap-2 transform hover:-translate-y-0.5">
+          <button onClick={() => { setEditingId(null); setCourseFormData({ title: "", instructor: "", price: "", duration: "", image: "", videoUrl: "", description: "", status: "Draft" }); setShowModal(true); }} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition flex items-center gap-2 transform hover:-translate-y-0.5">
             <Plus size={20}/> Create Course
           </button>
         </div>
@@ -69,7 +69,7 @@ const CourseManagement = () => {
                     <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
                         <button onClick={() => handleViewEnrollments(course.id)} className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition"><Users size={16}/> Students</button>
                         <div className="flex gap-2">
-                            <button onClick={() => { setEditingId(course.id); setFormData(course); setShowModal(true); }} className="text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 p-2 rounded-lg transition"><Edit size={18}/></button>
+                            <button onClick={() => { setEditingId(course.id); setCourseFormData(course); setShowModal(true); }} className="text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 p-2 rounded-lg transition"><Edit size={18}/></button>
                             <button onClick={() => handleDelete(course.id)} className="text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 p-2 rounded-lg transition"><Trash size={18}/></button>
                         </div>
                     </div>
@@ -91,19 +91,19 @@ const CourseManagement = () => {
                     <div className="grid md:grid-cols-2 gap-5">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-600 uppercase">Course Title</label>
-                            <input name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Master React JS" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
+                            <input name="title" value={courseFormData.title} onChange={handleChange} placeholder="e.g. Master React JS" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-600 uppercase">Instructor Name</label>
-                            <input name="instructor" value={formData.instructor} onChange={handleChange} placeholder="e.g. John Doe" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
+                            <input name="instructor" value={courseFormData.instructor} onChange={handleChange} placeholder="e.g. John Doe" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-600 uppercase">Price</label>
-                            <input name="price" value={formData.price} onChange={handleChange} placeholder="e.g. $49.99 or Free" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
+                            <input name="price" value={courseFormData.price} onChange={handleChange} placeholder="e.g. $49.99 or Free" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-600 uppercase">Duration</label>
-                            <input name="duration" value={formData.duration} onChange={handleChange} placeholder="e.g. 8 Weeks" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
+                            <input name="duration" value={courseFormData.duration} onChange={handleChange} placeholder="e.g. 8 Weeks" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
                         </div>
                     </div>
                     
@@ -112,14 +112,14 @@ const CourseManagement = () => {
                             <label className="text-xs font-bold text-gray-600 uppercase">Thumbnail Image URL</label>
                             <div className="relative">
                                 <ImageIcon className="absolute left-3 top-3.5 text-gray-400" size={18}/>
-                                <input name="image" value={formData.image} onChange={handleChange} placeholder="https://..." className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                                <input name="image" value={courseFormData.image} onChange={handleChange} placeholder="https://..." className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
                             </div>
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-600 uppercase">Video Embed URL (Youtube/Vimeo)</label>
                             <div className="relative">
                                 <PlayCircle className="absolute left-3 top-3.5 text-gray-400" size={18}/>
-                                <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} placeholder="https://www.youtube.com/embed/..." className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                                <input name="videoUrl" value={courseFormData.videoUrl} onChange={handleChange} placeholder="https://www.youtube.com/embed/..." className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
                             </div>
                             <p className="text-[10px] text-gray-400">Provide an embed URL. Example: https://www.youtube.com/embed/jBzwzrDvZ18</p>
                         </div>
@@ -127,12 +127,12 @@ const CourseManagement = () => {
 
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-600 uppercase">Course Description</label>
-                        <textarea name="description" value={formData.description} onChange={handleChange} placeholder="What will students learn?" rows={4} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y" required />
+                        <textarea name="description" value={courseFormData.description} onChange={handleChange} placeholder="What will students learn?" rows={4} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y" required />
                     </div>
 
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-600 uppercase">Status</label>
-                        <select name="status" value={formData.status} onChange={handleChange} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
+                        <select name="status" value={courseFormData.status} onChange={handleChange} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
                             <option value="Draft">Draft</option>
                             <option value="Published">Published</option>
                         </select>

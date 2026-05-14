@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function StudentDashboard() {
   const [student, setStudent] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [contactFormData, setContactFormData] = useState({ name: "", email: "", message: "" });
   const navigate = useNavigate();
 
   useEffect(() => {

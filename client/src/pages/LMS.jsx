@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download, Sparkles, Loader2 } from "lucide-react";
+import { BookOpen, Clock, DollarSign, User, Star, Search, PlayCircle, CheckCircle, X, Download, Sparkles, Loader2, Lock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
 const DEFAULT_MOCK_COURSES = [
@@ -22,6 +23,7 @@ const LMS = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentCourse, setPaymentCourse] = useState(null);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [showEnrollSuccess, setShowEnrollSuccess] = useState(false);
 
   useEffect(() => {
     
@@ -80,7 +82,7 @@ const LMS = () => {
         localStorage.setItem(`student_enrollments_${userId}`, JSON.stringify(newEnrollments));
     }
     
-    alert("Success! You are now enrolled.");
+    setShowEnrollSuccess(true);
     setActiveTab("my");
   };
 
@@ -441,6 +443,32 @@ const LMS = () => {
               </div>
           </div>
       )}
+
+      {/* Enrollment Success Modal */}
+      <AnimatePresence>
+        {showEnrollSuccess && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl"
+            >
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle size={40} />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Enrolled Successfully!</h3>
+              <p className="text-gray-500 mb-8">You can now access all course materials and track your progress.</p>
+              <button 
+                onClick={() => setShowEnrollSuccess(false)}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5"
+              >
+                Start Learning
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -30,12 +30,12 @@ const Footer = () => {
     setLoading(true);
     setStatus("");
 
-    const formData = new FormData(e.target);
+    const contactFormBody = new FormData(e.target);
 
     try {
       const response = await fetch("https://getform.io/f/ayvewgeb", {
         method: "POST",
-        body: formData,
+        body: contactFormBody,
       });
 
       if (response.ok) {
