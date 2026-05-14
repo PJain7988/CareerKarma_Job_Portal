@@ -179,9 +179,6 @@ const JobManagement = () => {
                       <Trash2 size={18} />
                     </button>
                   </td>
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>

@@ -2,7 +2,9 @@ import express from "express";
 import axios from "axios";
 import OpenAI from "openai";
 import multer from "multer";
-import pdfParse from "pdf-parse";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse");
 import mammoth from "mammoth";
 
 const router = express.Router();
