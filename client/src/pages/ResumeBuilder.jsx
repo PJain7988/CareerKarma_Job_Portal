@@ -466,7 +466,7 @@ Make the descriptions professional, use action verbs, and keep it realistic. Pro
                 <div className="mb-8">
                     <h3 className="text-lg font-bold text-indigo-700 uppercase tracking-wide border-b-2 border-indigo-100 pb-2 mb-4">Skills</h3>
                     <div className="flex flex-wrap gap-2">
-                        {f.skills.split(',').map((skill, i) => skill.trim() && (
+                        {(f.skills || "").split(',').map((skill, i) => skill.trim() && (
                             <span key={i} className="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full">{skill.trim()}</span>
                         ))}
                     </div>

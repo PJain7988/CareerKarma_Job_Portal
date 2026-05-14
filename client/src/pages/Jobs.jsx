@@ -128,7 +128,7 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await onSubmit(job, coverLetter, resumeText, resumeFile, formData);
+    await onSubmit(job, coverLetter, resumeText, resumeFile, applicationData);
     setIsSubmitting(false);
   };
 
@@ -229,7 +229,7 @@ const ApplyModal = ({ job, onClose, onSubmit }) => {
                         </span>
                       </div>
                       
-                      {aiAnalysis.missingKeywords && aiAnalysis.missingKeywords.length > 0 && (
+                      {Array.isArray(aiAnalysis.missingKeywords) && aiAnalysis.missingKeywords.length > 0 && (
                         <div className="mb-2">
                           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Missing Keywords</p>
                           <div className="flex flex-wrap gap-1">

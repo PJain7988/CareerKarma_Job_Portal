@@ -25,8 +25,11 @@ export default function ResumeAnalyzer() {
         jobDescription: targetJob
       });
       
-      const keywordsData = data.keywordsMatched && data.keywordsMatched.length > 0 
-        ? data.keywordsMatched.slice(0, 5).map(k => ({ name: k, val: Math.floor(Math.random() * 20 + 80) }))
+      const keywordsMatchedArr = Array.isArray(data.keywordsMatched) ? data.keywordsMatched : [];
+      const missingKeywordsArr = Array.isArray(data.missingKeywords) ? data.missingKeywords : [];
+
+      const keywordsData = keywordsMatchedArr.length > 0 
+        ? keywordsMatchedArr.slice(0, 5).map(k => ({ name: k, val: Math.floor(Math.random() * 20 + 80) }))
         : [{ name: "Formatting", val: 85 }, { name: "Keywords", val: 75 }];
 
       let tipsArray = [];
@@ -40,7 +43,7 @@ export default function ResumeAnalyzer() {
       setResult({
         score: data.score || 0,
         keywords: keywordsData,
-        missing: data.missingKeywords || [],
+        missing: missingKeywordsArr,
         tips: tipsArray.length > 0 ? tipsArray : ["Quantify your achievements with metrics.", "Use more impactful action verbs.", "Ensure your formatting is ATS-friendly."]
       });
     } catch (err) {

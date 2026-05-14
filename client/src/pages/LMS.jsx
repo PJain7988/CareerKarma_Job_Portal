@@ -409,13 +409,20 @@ const LMS = () => {
                           {/* Active Content: QR Code Placeholder */}
                           <div className="text-center animate-in fade-in flex flex-col items-center justify-center h-full">
                               <p className="text-sm text-gray-600 mb-4 font-medium">Scan with any UPI App</p>
-                              <div className="bg-gray-100 p-8 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center">
-                                  <div className="w-24 h-24 bg-gray-200 rounded flex items-center justify-center text-gray-400 font-bold text-xs">QR CODE</div>
+                              <div className="bg-white p-4 rounded-2xl border-2 border-indigo-100 shadow-inner flex items-center justify-center relative group">
+                                  <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
+                                      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                                      <path d="M14 14h1M18 14h3M14 18h1M18 18h3M14 21h7M18 14v7M14 14v7" />
+                                      <rect x="6" y="6" width="1" height="1" /><rect x="17" y="6" width="1" height="1" /><rect x="6" y="17" width="1" height="1" />
+                                  </svg>
+                                  <div className="absolute inset-0 flex items-center justify-center bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <Sparkles className="text-indigo-600 animate-pulse" size={40} />
+                                  </div>
                               </div>
-                              <div className="flex justify-center gap-4 mt-6">
-                                  <span className="text-xs font-bold text-gray-400">BHIM</span>
-                                  <span className="text-xs font-bold text-gray-400">GPAY</span>
-                                  <span className="text-xs font-bold text-gray-400">PHONEPE</span>
+                              <div className="flex justify-center gap-6 mt-6 grayscale opacity-60">
+                                  <span className="text-[10px] font-black tracking-tighter border border-gray-300 px-2 py-0.5 rounded">BHIM</span>
+                                  <span className="text-[10px] font-black tracking-tighter border border-gray-300 px-2 py-0.5 rounded italic">GPay</span>
+                                  <span className="text-[10px] font-black tracking-tighter border border-gray-300 px-2 py-0.5 rounded">PhonePe</span>
                               </div>
                           </div>
                       </div>

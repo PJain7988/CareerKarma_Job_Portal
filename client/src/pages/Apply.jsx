@@ -13,7 +13,7 @@ export default function Apply() {
   const [submitting, setSubmitting] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   
-  const [formData, setFormData] = useState({
+  const [applicationData, setApplicationData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -45,7 +45,7 @@ export default function Apply() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setApplicationData(prev => ({ ...prev, [name]: value }));
   };
 
   async function submit(e) {
@@ -79,16 +79,16 @@ export default function Apply() {
 
       const { data } = await api.post("/applications", { 
         jobId: id,
-        coverLetter: formData.coverLetter,
-        resumeText: formData.resumeText,
+        coverLetter: applicationData.coverLetter,
+        resumeText: applicationData.resumeText,
         resume: resumeFilename,
         candidateDetails: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          linkedin: formData.linkedin,
-          portfolio: formData.portfolio
+          firstName: applicationData.firstName,
+          lastName: applicationData.lastName,
+          email: applicationData.email,
+          phone: applicationData.phone,
+          linkedin: applicationData.linkedin,
+          portfolio: applicationData.portfolio
         }
       });
       setResult(data);
@@ -106,9 +106,9 @@ export default function Apply() {
     }
     setAnalyzing(true);
     try {
-      const jobDesc = job ? job.description : formData.coverLetter;
+      const jobDesc = job ? job.description : applicationData.coverLetter;
       const { data } = await api.post("/ai/analyze-resume", { 
-        resumeText: formData.resumeText, 
+        resumeText: applicationData.resumeText, 
         jobDescription: jobDesc 
       });
       setAiAnalysis(data);
@@ -154,27 +154,27 @@ export default function Apply() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-                    <input required type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="John" />
+                    <input required type="text" name="firstName" value={applicationData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="John" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-                    <input required type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Doe" />
+                    <input required type="text" name="lastName" value={applicationData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="Doe" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-                    <input required type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="john@example.com" />
+                    <input required type="email" name="email" value={applicationData.email} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="john@example.com" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="+1 (555) 000-0000" />
+                    <input type="tel" name="phone" value={applicationData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="+1 (555) 000-0000" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn Profile</label>
-                    <input type="url" name="linkedin" value={formData.linkedin} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://linkedin.com/in/johndoe" />
+                    <input type="url" name="linkedin" value={applicationData.linkedin} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://linkedin.com/in/johndoe" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Portfolio / Website</label>
-                    <input type="url" name="portfolio" value={formData.portfolio} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://johndoe.com" />
+                    <input type="url" name="portfolio" value={applicationData.portfolio} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://johndoe.com" />
                   </div>
                 </div>
               </div>
@@ -211,7 +211,7 @@ export default function Apply() {
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Cover Letter</label>
                   <p className="text-xs text-gray-500 mb-2">Introduce yourself and explain why you're a strong fit for this role.</p>
-                  <textarea name="coverLetter" value={formData.coverLetter} onChange={handleInputChange} rows={5} className="w-full border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition resize-y" placeholder="Write your cover letter here..." />
+                  <textarea name="coverLetter" value={applicationData.coverLetter} onChange={handleInputChange} rows={5} className="w-full border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition resize-y" placeholder="Write your cover letter here..." />
                 </div>
 
                 <div>
@@ -222,7 +222,7 @@ export default function Apply() {
                     </button>
                   </label>
                   <p className="text-xs text-gray-500 mb-2">Paste your resume text below to get an instant AI match score against the job description.</p>
-                  <textarea name="resumeText" value={formData.resumeText} onChange={handleInputChange} rows={4} className="w-full border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition resize-y" placeholder="Paste resume plain text here..." />
+                  <textarea name="resumeText" value={applicationData.resumeText} onChange={handleInputChange} rows={4} className="w-full border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition resize-y" placeholder="Paste resume plain text here..." />
                   
                   {aiAnalysis && (
                     <div className="mt-4 bg-purple-50 border border-purple-100 rounded-xl p-5 animate-in fade-in slide-in-from-top-2">
@@ -233,7 +233,7 @@ export default function Apply() {
                         </span>
                       </div>
                       
-                      {aiAnalysis.missingKeywords && aiAnalysis.missingKeywords.length > 0 && (
+                      {Array.isArray(aiAnalysis.missingKeywords) && aiAnalysis.missingKeywords.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Missing Keywords</p>
                           <div className="flex flex-wrap gap-2">
@@ -257,7 +257,7 @@ export default function Apply() {
                 <button type="button" onClick={() => nav("/jobs")} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
                   Cancel
                 </button>
-                <button type="submit" disabled={submitting || (!resumeFile && !formData.resumeText && !formData.coverLetter && !formData.firstName)} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md disabled:opacity-70 flex items-center gap-2">
+                <button type="submit" disabled={submitting || (!resumeFile && !applicationData.resumeText && !applicationData.coverLetter && !applicationData.firstName)} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md disabled:opacity-70 flex items-center gap-2">
                   {submitting ? (
                     <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Submitting...</>
                   ) : "Submit Application"}
