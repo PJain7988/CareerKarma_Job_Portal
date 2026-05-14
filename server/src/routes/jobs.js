@@ -131,18 +131,19 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
+router.put("/:id", protect, async (req, res) => {
+  try {
+    const updatedJob = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedJob);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating job" });
+  }
+});
+
 router.delete("/:id", protect, async (req, res) => {
     try {
         await Job.findByIdAndDelete(req.params.id);
         res.json({ message: "Deleted" });
-    } catch(e) { res.status(500).send("Error"); }
-});
-
-router.put("/:id", protect, async (req, res) => {
-    try {
-        const job = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!job) return res.status(404).json({ message: "Job not found" });
-        res.json(job);
     } catch(e) { res.status(500).send("Error"); }
 });
 

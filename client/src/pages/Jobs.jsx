@@ -301,7 +301,8 @@ export default function Jobs() {
     id: String(job._id || job.id),
     title: job.title, company: job.company, location: job.location,
     type: job.type, description: job.description, salary: job.salary || "Not Disclosed",
-    hrEmail: job.hrEmail, deadline: job.deadline,
+    hrEmail: job.hrEmail,
+    deadline: job.deadline,
     url: job.url || '#', isLocal: !!job._id, createdAt: job.createdAt
   });
 
@@ -340,7 +341,7 @@ export default function Jobs() {
 
   const filteredJobs = useMemo(() => {
     return rawJobs.filter((job) => {
-      // Automatic removal if deadline has passed
+      // Filter out jobs with a deadline in the past
       if (job.deadline && new Date(job.deadline) < new Date()) {
           return false;
       }
