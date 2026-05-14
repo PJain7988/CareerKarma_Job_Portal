@@ -138,4 +138,12 @@ router.delete("/:id", protect, async (req, res) => {
     } catch(e) { res.status(500).send("Error"); }
 });
 
+router.put("/:id", protect, async (req, res) => {
+    try {
+        const job = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!job) return res.status(404).json({ message: "Job not found" });
+        res.json(job);
+    } catch(e) { res.status(500).send("Error"); }
+});
+
 export default router;

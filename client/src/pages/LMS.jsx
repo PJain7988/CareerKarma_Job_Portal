@@ -19,6 +19,9 @@ const LMS = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingCourse, setViewingCourse] = useState(null);
   const [userId, setUserId] = useState(null); // Store usr id
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentCourse, setPaymentCourse] = useState(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   useEffect(() => {
     
@@ -61,10 +64,16 @@ const LMS = () => {
         return;
     }
     if (course.price && course.price.toLowerCase() !== "free" && course.price !== "$0") {
-        if(!window.confirm(`Pay ${course.price} to enroll?`)) return;
+        setPaymentCourse(course);
+        setShowPaymentModal(true);
+        return;
     }
 
-    const newEnrollments = [...enrolledIds, course.id];
+    processEnrollment(course.id);
+  };
+
+  const processEnrollment = (courseId) => {
+    const newEnrollments = [...enrolledIds, courseId];
     setEnrolledIds(newEnrollments);
     
     if (userId) {
@@ -73,6 +82,19 @@ const LMS = () => {
     
     alert("Success! You are now enrolled.");
     setActiveTab("my");
+  };
+
+  const handlePaymentSubmit = (e) => {
+      e.preventDefault();
+      setProcessingPayment(true);
+      
+      // Mock payment delay
+      setTimeout(() => {
+          setProcessingPayment(false);
+          setShowPaymentModal(false);
+          processEnrollment(paymentCourse.id);
+          setPaymentCourse(null);
+      }, 1500);
   };
 
   const handleCompleteCourse = (courseId) => {
@@ -330,6 +352,64 @@ const LMS = () => {
           </div>
         )}
       </div>
+
+      {/* Payment Gateway Modal */}
+      {showPaymentModal && paymentCourse && (
+          <div className="fixed inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
+              <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                  <div className="bg-gray-50 border-b border-gray-100 p-6 flex justify-between items-center">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2"><DollarSign className="text-indigo-600 bg-indigo-100 rounded-full p-1"/> Secure Checkout</h2>
+                        <p className="text-sm text-gray-500 mt-1">Enroll in {paymentCourse.title}</p>
+                      </div>
+                      <button onClick={() => !processingPayment && setShowPaymentModal(false)} className="text-gray-400 hover:text-gray-600 bg-white p-1.5 rounded-full shadow-sm border border-gray-100 transition disabled:opacity-50" disabled={processingPayment}>
+                          <X size={20}/>
+                      </button>
+                  </div>
+                  
+                  <div className="p-6">
+                      <div className="flex justify-between items-center bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-6">
+                          <span className="font-medium text-indigo-900">Total Amount</span>
+                          <span className="text-2xl font-black text-indigo-700">{paymentCourse.price}</span>
+                      </div>
+
+                      <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                          <div>
+                              <label className="text-xs font-bold text-gray-600 uppercase">Cardholder Name</label>
+                              <input required placeholder="John Doe" className="w-full p-3 mt-1 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" disabled={processingPayment}/>
+                          </div>
+                          <div>
+                              <label className="text-xs font-bold text-gray-600 uppercase">Card Number</label>
+                              <div className="relative">
+                                  <input required placeholder="0000 0000 0000 0000" maxLength="19" className="w-full p-3 mt-1 pl-10 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-mono" disabled={processingPayment}/>
+                                  <div className="absolute left-3 top-4 flex gap-1">
+                                      <div className="w-4 h-4 rounded-full bg-red-500/80"></div>
+                                      <div className="w-4 h-4 rounded-full bg-yellow-500/80 -ml-2 mix-blend-multiply"></div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                  <label className="text-xs font-bold text-gray-600 uppercase">Expiry Date</label>
+                                  <input required placeholder="MM/YY" maxLength="5" className="w-full p-3 mt-1 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" disabled={processingPayment}/>
+                              </div>
+                              <div>
+                                  <label className="text-xs font-bold text-gray-600 uppercase">CVC</label>
+                                  <input required placeholder="123" maxLength="3" type="password" className="w-full p-3 mt-1 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" disabled={processingPayment}/>
+                              </div>
+                          </div>
+
+                          <button type="submit" disabled={processingPayment} className="w-full mt-6 bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5">
+                              {processingPayment ? <><Loader2 size={20} className="animate-spin"/> Processing...</> : `Pay ${paymentCourse.price} & Enroll`}
+                          </button>
+                          <p className="text-center text-[10px] text-gray-400 mt-3 uppercase tracking-wider flex items-center justify-center gap-1">
+                              <CheckCircle size={10}/> Payments are secure and encrypted
+                          </p>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      )}
     </div>
   );
 };

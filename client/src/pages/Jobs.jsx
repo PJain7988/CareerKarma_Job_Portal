@@ -301,7 +301,7 @@ export default function Jobs() {
     id: String(job._id || job.id),
     title: job.title, company: job.company, location: job.location,
     type: job.type, description: job.description, salary: job.salary || "Not Disclosed",
-    hrEmail: job.hrEmail,
+    hrEmail: job.hrEmail, deadline: job.deadline,
     url: job.url || '#', isLocal: !!job._id, createdAt: job.createdAt
   });
 
@@ -340,6 +340,11 @@ export default function Jobs() {
 
   const filteredJobs = useMemo(() => {
     return rawJobs.filter((job) => {
+      // Automatic removal if deadline has passed
+      if (job.deadline && new Date(job.deadline) < new Date()) {
+          return false;
+      }
+
       const matchesSearch = !searchQuery || job.title.toLowerCase().includes(searchQuery.toLowerCase()) || job.company.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesLocation = !locationQuery || job.location.toLowerCase().includes(locationQuery.toLowerCase());
       

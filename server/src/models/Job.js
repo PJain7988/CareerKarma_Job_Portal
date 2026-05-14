@@ -33,6 +33,7 @@ const jobSchema = new mongoose.Schema(
     description: { type: String, default: "" },
     salary: { type: String, default: "Not Disclosed" },
     hrEmail: { type: String, default: "" }, // NEW FIELD
+    deadline: { type: Date }, // NEW FIELD for auto-removal
     postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }

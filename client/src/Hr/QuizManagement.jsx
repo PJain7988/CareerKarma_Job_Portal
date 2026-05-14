@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi"; 
-import { Plus, Users, X, UserCheck, Copy, BrainCircuit, Target, Clock } from "lucide-react"; 
+import { Plus, Users, X, UserCheck, Copy, BrainCircuit, Target, Clock, BookOpen } from "lucide-react"; 
 
 const DEFAULT_MOCK_QUIZZES = [
   { id: "default_1", title: "React Fundamentals", category: "Frontend", level: "Easy", status: "Active", duration: "10", questions: [], attempts: 120, published: true },
@@ -16,6 +16,7 @@ const QuizManagement = () => {
   });
   
   const [quizForm, setQuizForm] = useState({ title: "", description: "", category: "", subject: "", level: "Easy", status: "Active", duration: "10" });
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false); 
   const [currentQuizResults, setCurrentQuizResults] = useState([]); 
@@ -25,12 +26,14 @@ const QuizManagement = () => {
   useEffect(() => { localStorage.setItem("hr_demo_quizzes", JSON.stringify(quizzes)); }, [quizzes]);
 
   const handleQuizFormChange = (e) => setQuizForm({ ...quizForm, [e.target.name]: e.target.value });
-  const handleAddOrEditQuiz = () => {
+  const handleAddOrEditQuiz = (e) => {
+    e.preventDefault();
     if (!quizForm.title.trim()) return;
     const safeDuration = parseInt(quizForm.duration) || 10;
     const updated = [{ id: Date.now(), ...quizForm, duration: safeDuration, questions: [], attempts: 0, published: false }, ...quizzes];
     setQuizzes(updated);
     setQuizForm({ title: "", description: "", category: "", subject: "", level: "Easy", status: "Active", duration: "10" });
+    setShowCreateModal(false);
   };
   const handleDeleteQuiz = (index) => { if(window.confirm("Are you sure you want to delete this quiz?")) setQuizzes(quizzes.filter((_, i) => i !== index)); };
   
@@ -58,44 +61,84 @@ const QuizManagement = () => {
             <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3"><BrainCircuit className="text-indigo-600" size={32}/> Quiz Management</h1>
             <p className="text-gray-500 mt-1">Create assessments and track candidate performance.</p>
           </div>
+          <button onClick={() => setShowCreateModal(true)} className="mt-4 md:mt-0 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition flex items-center gap-2 transform hover:-translate-y-0.5">
+            <Plus size={20}/> Create Assessment
+          </button>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900"><Plus size={20} className="text-indigo-600"/> Create New Assessment</h2>
-            <div className="grid md:grid-cols-4 gap-4">
-                <input name="title" placeholder="Quiz Title (e.g. React Basics)" value={quizForm.title} onChange={handleQuizFormChange} className="p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition col-span-2" />
-                <input name="category" placeholder="Category (e.g. Frontend)" value={quizForm.category} onChange={handleQuizFormChange} className="p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
-                <input type="number" name="duration" placeholder="Duration (Mins)" value={quizForm.duration} onChange={handleQuizFormChange} className="p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
-                <button onClick={handleAddOrEditQuiz} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 col-span-4 md:col-span-1 md:col-start-4 flex justify-center items-center gap-2"><Plus size={18}/> Create</button>
+        {quizzes.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                <BrainCircuit size={64} className="mx-auto text-gray-300 mb-4"/>
+                <h3 className="text-xl font-medium text-gray-600">No quizzes available.</h3>
+                <p className="text-gray-400 mt-2">Click 'Create Assessment' to get started.</p>
             </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quizzes.map((quiz, index) => (
-                <div key={quiz.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300 flex flex-col group">
-                    <div className="h-2 bg-indigo-600"></div>
-                    <div className="p-6 flex flex-col flex-1">
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-xl font-bold text-gray-900 line-clamp-1">{quiz.title}</h3>
-                            <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">{quiz.status}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-6">
-                            <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100"><Target size={14} className="text-indigo-500"/> {quiz.category || "General"}</span>
-                            <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100"><Clock size={14} className="text-indigo-500"/> {quiz.duration} mins</span>
-                            <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100"><Target size={14} className="text-indigo-500"/> {quiz.questions?.length || 0} Qs</span>
-                        </div>
-                        <div className="mt-auto border-t border-gray-100 pt-4 flex justify-between items-center">
-                            <button onClick={() => handleViewResults(quiz.id)} className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition"><Users size={16}/> Results</button>
-                            <div className="flex gap-2">
-                                <button onClick={() => openQuestionModal(index)} className="text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 p-2 rounded-lg transition" title="Edit Questions"><FiEdit size={18}/></button>
-                                <button onClick={() => handleDeleteQuiz(index)} className="text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 p-2 rounded-lg transition"><FiTrash2 size={18}/></button>
+        ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {quizzes.map((quiz, index) => (
+                    <div key={quiz.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300 flex flex-col group">
+                        <div className="h-2 bg-indigo-600"></div>
+                        <div className="p-6 flex flex-col flex-1">
+                            <div className="flex justify-between items-start mb-4">
+                                <h3 className="text-xl font-bold text-gray-900 line-clamp-1">{quiz.title}</h3>
+                                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">{quiz.status}</span>
+                            </div>
+                            <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-6">
+                                <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100"><Target size={14} className="text-indigo-500"/> {quiz.category || "General"}</span>
+                                <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100"><Clock size={14} className="text-indigo-500"/> {quiz.duration} mins</span>
+                                <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100"><BookOpen size={14} className="text-indigo-500"/> {quiz.questions?.length || 0} Qs</span>
+                            </div>
+                            <div className="mt-auto border-t border-gray-100 pt-4 flex justify-between items-center">
+                                <button onClick={() => handleViewResults(quiz.id)} className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition"><Users size={16}/> Results</button>
+                                <div className="flex gap-2">
+                                    <button onClick={() => openQuestionModal(index)} className="text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 p-2 rounded-lg transition" title="Edit Questions"><FiEdit size={18}/></button>
+                                    <button onClick={() => handleDeleteQuiz(index)} className="text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 p-2 rounded-lg transition"><FiTrash2 size={18}/></button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        )}
 
+        {/* CREATE MODAL */}
+        {showCreateModal && (
+            <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+                <div className="bg-white p-8 rounded-2xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 my-8 relative">
+                    <button onClick={() => setShowCreateModal(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition"><X size={20}/></button>
+                    <h2 className="text-2xl font-black mb-6 text-gray-900">Create New Assessment</h2>
+                    <form onSubmit={handleAddOrEditQuiz} className="space-y-5">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-600 uppercase">Quiz Title</label>
+                            <input name="title" value={quizForm.title} onChange={handleQuizFormChange} placeholder="e.g. React Basics" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-5">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-600 uppercase">Category</label>
+                                <input name="category" value={quizForm.category} onChange={handleQuizFormChange} placeholder="e.g. Frontend" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-600 uppercase">Duration (Mins)</label>
+                                <input type="number" name="duration" value={quizForm.duration} onChange={handleQuizFormChange} placeholder="10" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" required min="1" />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-600 uppercase">Level</label>
+                            <select name="level" value={quizForm.level} onChange={handleQuizFormChange} className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div className="pt-4 flex gap-3">
+                            <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-50 transition">Cancel</button>
+                            <button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">Create Assessment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        )}
+
+        {/* QUESTIONS MODAL */}
         {showQuestionModal && (
           <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
             <div className="bg-white p-8 rounded-3xl w-full max-w-4xl max-h-[85vh] overflow-y-auto relative shadow-2xl animate-in zoom-in-95 duration-200">

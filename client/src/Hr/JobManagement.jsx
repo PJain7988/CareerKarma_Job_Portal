@@ -12,6 +12,7 @@ const JobManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingJob, setEditingJob] = useState(null);
 
   const getAuthConfig = () => {
     let token = localStorage.getItem("token");
@@ -47,15 +48,21 @@ const JobManagement = () => {
       salary: form.salary.value,
       description: form.description.value,
       hrEmail: form.hrEmail.value,
+      deadline: form.deadline.value || null,
       status: "Active"
     };
 
     try {
-      await axios.post(`${BACKEND_URL}/api/jobs`, payload, getAuthConfig());
+      if (editingJob) {
+        await axios.put(`${BACKEND_URL}/api/jobs/${editingJob._id}`, payload, getAuthConfig());
+      } else {
+        await axios.post(`${BACKEND_URL}/api/jobs`, payload, getAuthConfig());
+      }
       setShowModal(false);
+      setEditingJob(null);
       fetchJobs();
     } catch {
-      alert("Failed to create job.");
+      alert(`Failed to ${editingJob ? "update" : "create"} job.`);
     }
   };
 
@@ -79,10 +86,10 @@ const JobManagement = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3"><Briefcase className="text-indigo-600" size={32}/> Job Management</h1>
-            <p className="text-gray-500 mt-1">Create job postings and manage candidate applications.</p>
+            <p className="text-gray-500 mt-1">Create job postings, set deadlines, and manage candidate applications.</p>
           </div>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => { setEditingJob(null); setShowModal(true); }}
             className="mt-4 md:mt-0 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5"
           >
             <Plus size={20} />
@@ -114,44 +121,61 @@ const JobManagement = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredJobs.map((job) => (
-                <tr key={job._id} className="hover:bg-gray-50 transition duration-150">
-                  <td className="px-6 py-5">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-base">{job.title}</span>
-                      <span className="text-sm text-gray-500 flex items-center gap-1 mt-1"><Building size={14}/> {job.company}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">
-                      <div className="flex items-center gap-1 text-gray-600 font-medium text-sm"><MapPin size={16} className="text-gray-400"/> {job.location}</div>
-                  </td>
-                  <td className="px-6 py-5">
-                    <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
-                      {job.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 font-medium text-gray-700 text-sm">
-                      <div className="flex items-center gap-1"><DollarSign size={16} className="text-gray-400"/> {job.salary || "Not Specified"}</div>
-                  </td>
-                  <td className="px-6 py-5">
-                    <button
-                      onClick={() => navigate("/hr-dashboard/applications")}
-                      className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition border border-indigo-100"
-                    >
-                      <Users size={16} /> View
-                    </button>
-                  </td>
-                  <td className="px-6 py-5">
-                    <button
-                      onClick={() => handleDelete(job._id)}
-                      className="text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 p-2 rounded-lg transition"
-                      title="Delete Job"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredJobs.map((job) => {
+                const isExpired = job.deadline && new Date(job.deadline) < new Date();
+                return (
+                  <tr key={job._id} className="hover:bg-gray-50 transition duration-150">
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-gray-900 text-base">{job.title}</span>
+                        <span className="text-sm text-gray-500 flex items-center gap-1 mt-1"><Building size={14}/> {job.company}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                        <div className="flex items-center gap-1 text-gray-600 font-medium text-sm"><MapPin size={16} className="text-gray-400"/> {job.location}</div>
+                    </td>
+                    <td className="px-6 py-5 flex flex-col gap-1 items-start">
+                      <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                        {job.type}
+                      </span>
+                      {job.deadline && (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isExpired ? "bg-red-50 text-red-600 border border-red-100" : "bg-orange-50 text-orange-600 border border-orange-100"}`}>
+                              {isExpired ? "Expired" : `Ends ${new Date(job.deadline).toLocaleDateString()}`}
+                          </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-5 font-medium text-gray-700 text-sm">
+                        <div className="flex items-center gap-1"><DollarSign size={16} className="text-gray-400"/> {job.salary || "Not Specified"}</div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <button
+                        onClick={() => navigate("/hr-dashboard/applications")}
+                        className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition border border-indigo-100"
+                      >
+                        <Users size={16} /> View
+                      </button>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => { setEditingJob(job); setShowModal(true); }}
+                            className="text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 p-2 rounded-lg transition"
+                            title="Edit Job"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(job._id)}
+                            className="text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 p-2 rounded-lg transition"
+                            title="Delete Job"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
@@ -202,33 +226,33 @@ const JobManagement = () => {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 relative my-8"
               >
-                <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition">
+                <button onClick={() => { setShowModal(false); setEditingJob(null); }} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition">
                   <X size={20} />
                 </button>
 
-                <h2 className="text-2xl font-black mb-6 text-gray-900">Post a New Job</h2>
+                <h2 className="text-2xl font-black mb-6 text-gray-900">{editingJob ? "Edit Job Posting" : "Post a New Job"}</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
                     <label className="text-xs font-bold text-gray-600 uppercase">Job Title</label>
-                    <input name="title" required placeholder="e.g. Senior Product Designer" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
+                    <input name="title" defaultValue={editingJob?.title} required placeholder="e.g. Senior Product Designer" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium" />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs font-bold text-gray-600 uppercase">Company Name</label>
-                      <input name="company" required placeholder="e.g. Acme Corp" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                      <input name="company" defaultValue={editingJob?.company} required placeholder="e.g. Acme Corp" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 uppercase">Location</label>
-                      <input name="location" required placeholder="e.g. Remote, NY" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                      <input name="location" defaultValue={editingJob?.location} required placeholder="e.g. Remote, NY" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs font-bold text-gray-600 uppercase">Job Type</label>
-                      <select name="type" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
+                      <select name="type" defaultValue={editingJob?.type || "Full-time"} className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
                         <option>Full-time</option>
                         <option>Part-time</option>
                         <option>Contract</option>
@@ -237,25 +261,29 @@ const JobManagement = () => {
                     </div>
                     <div>
                       <label className="text-xs font-bold text-gray-600 uppercase">Salary (Optional)</label>
-                      <input name="salary" placeholder="e.g. $100k - $120k" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                      <input name="salary" defaultValue={editingJob?.salary} placeholder="e.g. $100k - $120k" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 uppercase">HR Contact Email</label>
+                      <input name="hrEmail" defaultValue={editingJob?.hrEmail} type="email" required placeholder="e.g. hr@company.com" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 uppercase">Application Deadline</label>
+                      <input name="deadline" defaultValue={editingJob?.deadline ? new Date(editingJob.deadline).toISOString().split('T')[0] : ''} type="date" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
-                      HR Contact Email
-                    </label>
-                    <input name="hrEmail" type="email" required placeholder="e.g. hr@company.com" className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" />
-                  </div>
-
-                  <div>
                     <label className="text-xs font-bold text-gray-600 uppercase">Job Description</label>
-                    <textarea name="description" rows="4" required placeholder="Describe the role, responsibilities, and requirements..." className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y"></textarea>
+                    <textarea name="description" defaultValue={editingJob?.description} rows="4" required placeholder="Describe the role, responsibilities, and requirements..." className="w-full p-3 mt-1 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y"></textarea>
                   </div>
 
                   <div className="pt-4 flex gap-3">
-                    <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-50 transition">Cancel</button>
-                    <button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">Post Job Listing</button>
+                    <button type="button" onClick={() => { setShowModal(false); setEditingJob(null); }} className="flex-1 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-50 transition">Cancel</button>
+                    <button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">{editingJob ? "Update Job" : "Post Job Listing"}</button>
                   </div>
                 </form>
               </motion.div>
