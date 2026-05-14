@@ -171,6 +171,7 @@ const LMS = () => {
                     <div className="flex-1 bg-black flex flex-col">
                         <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                             <iframe 
+                                key={viewingCourse.id}
                                 className="absolute inset-0 w-full h-full" 
                                 src={viewingCourse.videoUrl || (
                                     viewingCourse.category === "Data Science" ? "https://www.youtube.com/embed/rfscVS0vtbw" :
@@ -443,7 +444,8 @@ const LMS = () => {
                               ].map((method) => (
                                 <button 
                                   key={method.id}
-                                  onClick={() => setPaymentMethod(method.id)}
+                                  type="button"
+                                  onClick={(e) => { e.preventDefault(); setPaymentMethod(method.id); }}
                                   className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition relative group ${paymentMethod === method.id ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
                                 >
                                     <div className={`p-2 rounded-lg transition duration-300 ${paymentMethod === method.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
@@ -454,6 +456,7 @@ const LMS = () => {
                               ))}
                           </div>
 
+                          <div key={paymentMethod} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                           {paymentMethod === "upi" && (
                               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center animate-in fade-in zoom-in-95">
                                   <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-4">
@@ -505,6 +508,7 @@ const LMS = () => {
                                   ))}
                               </div>
                           )}
+                        </div>
                       </div>
 
                       {/* Footer Action */}
