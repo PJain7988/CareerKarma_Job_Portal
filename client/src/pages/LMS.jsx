@@ -461,7 +461,6 @@ const LMS = () => {
                               ))}
                           </div>
 
-                          <div key={paymentMethod} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                           {paymentMethod === "upi" && (
                               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center animate-in fade-in zoom-in-95">
                                   <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-4">
@@ -537,7 +536,6 @@ const LMS = () => {
                                   </div>
                               </div>
                           )}
-                        </div>
                       </div>
 
                       {/* Footer Action */}
