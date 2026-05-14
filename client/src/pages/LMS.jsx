@@ -24,8 +24,8 @@ const LMS = () => {
   const [paymentCourse, setPaymentCourse] = useState(null);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [showEnrollSuccess, setShowEnrollSuccess] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("upi"); // 'upi' or 'card'
-  const [selectedSubMethod, setSelectedSubMethod] = useState(""); // e.g., 'SBI', 'Paytm'
+  const [paymentMethod, setPaymentMethod] = useState("upi"); // 'upi', 'card', 'net', 'wallet'
+  const [subMethod, setSubMethod] = useState(""); // Selected bank or wallet
 
   useEffect(() => {
     
@@ -446,7 +446,11 @@ const LMS = () => {
                                 <button 
                                   key={method.id}
                                   type="button"
-                                  onClick={(e) => { e.preventDefault(); setPaymentMethod(method.id); setSelectedSubMethod(""); }}
+                                  onClick={(e) => { 
+                                    e.preventDefault(); 
+                                    setPaymentMethod(method.id);
+                                    setSubMethod(""); // Reset selection when switching main method
+                                  }}
                                   className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition relative group ${paymentMethod === method.id ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
                                 >
                                     <div className={`p-2 rounded-lg transition duration-300 ${paymentMethod === method.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
@@ -492,20 +496,19 @@ const LMS = () => {
                                           <button 
                                             key={bank} 
                                             type="button"
-                                            onClick={() => setSelectedSubMethod(bank)}
-                                            className={`p-3 border rounded-xl text-sm font-bold transition flex items-center justify-between ${selectedSubMethod === bank ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-100 text-gray-700 hover:bg-gray-50'}`}
+                                            onClick={() => setSubMethod(bank)}
+                                            className={`p-3 border rounded-xl text-sm font-bold transition flex items-center justify-between ${subMethod === bank ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-gray-700 border-gray-100 hover:bg-indigo-50'}`}
                                           >
                                             {bank}
-                                            {selectedSubMethod === bank && <div className="w-2 h-2 rounded-full bg-indigo-600"></div>}
+                                            {subMethod === bank && <CheckCircle size={14} />}
                                           </button>
                                       ))}
                                   </div>
                                   <select 
+                                    onChange={(e) => setSubMethod(e.target.value)}
                                     className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none mt-2 focus:ring-2 focus:ring-indigo-500"
-                                    onChange={(e) => setSelectedSubMethod(e.target.value)}
-                                    value={['SBI', 'HDFC', 'ICICI', 'Axis'].includes(selectedSubMethod) ? "Other Banks" : selectedSubMethod}
                                   >
-                                      <option>Other Banks</option>
+                                      <option value="">Other Banks</option>
                                       <option value="PNB">Punjab National Bank</option>
                                       <option value="BOB">Bank of Baroda</option>
                                       <option value="Kotak">Kotak Mahindra</option>
@@ -514,19 +517,24 @@ const LMS = () => {
                           )}
 
                           {paymentMethod === "wallet" && (
-                              <div className="space-y-2 animate-in fade-in slide-in-from-right-4">
+                              <div className="space-y-3 animate-in fade-in slide-in-from-right-4">
                                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Wallet</p>
-                                  {['Paytm', 'PhonePe', 'Amazon Pay', 'MobiKwik'].map(wallet => (
-                                      <button 
-                                        key={wallet} 
-                                        type="button"
-                                        onClick={() => setSelectedSubMethod(wallet)}
-                                        className={`w-full p-3 border rounded-xl text-sm font-bold transition flex items-center justify-between ${selectedSubMethod === wallet ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-100 text-gray-700 hover:bg-gray-50'}`}
-                                      >
-                                          {wallet}
-                                          <div className={`w-4 h-4 rounded-full border transition-all ${selectedSubMethod === wallet ? 'border-indigo-600 bg-indigo-600 border-[5px]' : 'border-gray-300'}`}></div>
-                                      </button>
-                                  ))}
+                                  <div className="space-y-2">
+                                    {['Paytm', 'PhonePe', 'Amazon Pay', 'MobiKwik'].map(wallet => (
+                                        <button 
+                                          key={wallet} 
+                                          type="button"
+                                          onClick={() => setSubMethod(wallet)}
+                                          className={`w-full p-3 border rounded-xl text-sm font-bold transition text-left flex items-center justify-between ${subMethod === wallet ? 'bg-indigo-50 border-indigo-600 text-indigo-900 shadow-sm' : 'bg-white border-gray-100 text-gray-700 hover:bg-gray-50'}`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                              <div className={`w-2 h-2 rounded-full ${subMethod === wallet ? 'bg-indigo-600 animate-pulse' : 'bg-gray-200'}`}></div>
+                                              {wallet}
+                                            </div>
+                                            {subMethod === wallet && <CheckCircle size={16} className="text-indigo-600" />}
+                                        </button>
+                                    ))}
+                                  </div>
                               </div>
                           )}
                         </div>
@@ -542,7 +550,13 @@ const LMS = () => {
                               {processingPayment ? (
                                 <><Loader2 size={20} className="animate-spin"/> Processing Payment...</>
                               ) : (
-                                <><CheckCircle size={20} className="group-hover:scale-110 transition"/> Pay Now</>
+                                <><CheckCircle size={20} className="group-hover:scale-110 transition"/> {
+                                  processingPayment ? "Processing..." : 
+                                  subMethod ? `Pay via ${subMethod}` : 
+                                  paymentMethod === "card" ? "Pay via Card" :
+                                  paymentMethod === "upi" ? "Pay via UPI" :
+                                  "Pay Now"
+                                }</>
                               )}
                           </button>
                       </div>
