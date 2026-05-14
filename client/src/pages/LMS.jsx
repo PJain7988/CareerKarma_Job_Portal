@@ -353,59 +353,92 @@ const LMS = () => {
         )}
       </div>
 
-      {/* Payment Gateway Modal */}
+      {/* Razorpay Style Payment Gateway Modal */}
       {showPaymentModal && paymentCourse && (
-          <div className="fixed inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
-              <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                  <div className="bg-gray-50 border-b border-gray-100 p-6 flex justify-between items-center">
+          <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-[110] p-4 font-sans">
+              <div className="bg-white rounded-xl w-full max-w-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col md:flex-row h-auto md:h-[500px]">
+                  
+                  {/* Left Sidebar (Razorpay Branding / Summary) */}
+                  <div className="bg-indigo-900 text-white w-full md:w-1/3 p-6 flex flex-col justify-between">
                       <div>
-                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2"><DollarSign className="text-indigo-600 bg-indigo-100 rounded-full p-1"/> Secure Checkout</h2>
-                        <p className="text-sm text-gray-500 mt-1">Enroll in {paymentCourse.title}</p>
+                        <div className="flex items-center gap-2 mb-8">
+                            <div className="bg-white p-1.5 rounded-lg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#312E81"/>
+                                    <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <span className="font-bold text-xl tracking-wide">Razorpay</span>
+                        </div>
+                        <p className="text-indigo-200 text-sm mb-1 uppercase tracking-wider font-bold">Payment for</p>
+                        <h3 className="text-xl font-bold mb-6 leading-tight">{paymentCourse.title}</h3>
+                        
+                        <div className="bg-indigo-800/50 p-4 rounded-xl border border-indigo-700/50">
+                            <p className="text-indigo-200 text-sm">Amount to pay</p>
+                            <p className="text-3xl font-black mt-1">{paymentCourse.price}</p>
+                        </div>
                       </div>
-                      <button onClick={() => !processingPayment && setShowPaymentModal(false)} className="text-gray-400 hover:text-gray-600 bg-white p-1.5 rounded-full shadow-sm border border-gray-100 transition disabled:opacity-50" disabled={processingPayment}>
+                      
+                      <div className="mt-8 text-xs text-indigo-300 flex items-center gap-2">
+                          <Lock size={12}/> Secured by Razorpay
+                      </div>
+                  </div>
+
+                  {/* Right Content Area */}
+                  <div className="flex-1 bg-white p-6 md:p-8 flex flex-col relative overflow-y-auto">
+                      <button onClick={() => !processingPayment && setShowPaymentModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition disabled:opacity-50" disabled={processingPayment}>
                           <X size={20}/>
                       </button>
-                  </div>
-                  
-                  <div className="p-6">
-                      <div className="flex justify-between items-center bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-6">
-                          <span className="font-medium text-indigo-900">Total Amount</span>
-                          <span className="text-2xl font-black text-indigo-700">{paymentCourse.price}</span>
-                      </div>
 
-                      <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                          <div>
-                              <label className="text-xs font-bold text-gray-600 uppercase">Cardholder Name</label>
-                              <input required placeholder="John Doe" className="w-full p-3 mt-1 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" disabled={processingPayment}/>
+                      <h2 className="text-lg font-bold text-gray-800 mb-6 border-b pb-3">Select Payment Method</h2>
+
+                      <div className="flex-1">
+                          {/* Tabs or Options (Simulated UPI/QR) */}
+                          <div className="grid grid-cols-2 gap-4 mb-6">
+                              <button className="flex flex-col items-center justify-center p-4 border-2 border-indigo-600 bg-indigo-50 rounded-xl text-indigo-700 transition">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                                  <span className="font-bold text-sm">UPI / QR</span>
+                              </button>
+                              <button className="flex flex-col items-center justify-center p-4 border border-gray-200 hover:border-gray-300 rounded-xl text-gray-600 transition opacity-50 cursor-not-allowed">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                  <span className="font-bold text-sm">Card</span>
+                              </button>
                           </div>
-                          <div>
-                              <label className="text-xs font-bold text-gray-600 uppercase">Card Number</label>
-                              <div className="relative">
-                                  <input required placeholder="0000 0000 0000 0000" maxLength="19" className="w-full p-3 mt-1 pl-10 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition font-mono" disabled={processingPayment}/>
-                                  <div className="absolute left-3 top-4 flex gap-1">
-                                      <div className="w-4 h-4 rounded-full bg-red-500/80"></div>
-                                      <div className="w-4 h-4 rounded-full bg-yellow-500/80 -ml-2 mix-blend-multiply"></div>
+
+                          {/* Active Content: QR Code */}
+                          <div className="text-center animate-in fade-in flex flex-col items-center justify-center h-full">
+                              <p className="text-sm text-gray-600 mb-4 font-medium">Scan with any UPI App</p>
+                              <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 inline-block">
+                                  {/* Simulated QR Code using nested divs to look like a QR */}
+                                  <div className="w-40 h-40 grid grid-cols-5 grid-rows-5 gap-1 p-2 bg-black rounded-lg">
+                                      <div className="bg-white rounded-tl-md row-span-2 col-span-2 relative"><div className="absolute inset-1.5 bg-black rounded-sm"></div></div>
+                                      <div className="bg-white col-span-1 row-span-1"></div>
+                                      <div className="bg-white rounded-tr-md row-span-2 col-span-2 relative"><div className="absolute inset-1.5 bg-black rounded-sm"></div></div>
+                                      <div className="bg-white col-span-1 row-span-3"></div>
+                                      <div className="bg-white col-span-2 row-span-1"></div>
+                                      <div className="bg-white rounded-bl-md row-span-2 col-span-2 relative"><div className="absolute inset-1.5 bg-black rounded-sm"></div></div>
+                                      <div className="bg-white col-span-2 row-span-2"></div>
+                                      <div className="bg-white rounded-br-md row-span-1 col-span-1 relative"></div>
                                   </div>
                               </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                  <label className="text-xs font-bold text-gray-600 uppercase">Expiry Date</label>
-                                  <input required placeholder="MM/YY" maxLength="5" className="w-full p-3 mt-1 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" disabled={processingPayment}/>
-                              </div>
-                              <div>
-                                  <label className="text-xs font-bold text-gray-600 uppercase">CVC</label>
-                                  <input required placeholder="123" maxLength="3" type="password" className="w-full p-3 mt-1 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" disabled={processingPayment}/>
+                              <div className="flex justify-center gap-4 mt-6">
+                                  <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-4 opacity-50" />
+                                  <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Google_Pay_logo.svg" alt="GPay" className="h-4 opacity-50" />
                               </div>
                           </div>
+                      </div>
 
-                          <button type="submit" disabled={processingPayment} className="w-full mt-6 bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5">
-                              {processingPayment ? <><Loader2 size={20} className="animate-spin"/> Processing...</> : `Pay ${paymentCourse.price} & Enroll`}
+                      {/* Action Button */}
+                      <div className="mt-auto pt-6 border-t border-gray-100">
+                          <button 
+                              onClick={handlePaymentSubmit} 
+                              disabled={processingPayment} 
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+                          >
+                              {processingPayment ? <><Loader2 size={20} className="animate-spin"/> Processing Payment...</> : `Simulate Successful Payment`}
                           </button>
-                          <p className="text-center text-[10px] text-gray-400 mt-3 uppercase tracking-wider flex items-center justify-center gap-1">
-                              <CheckCircle size={10}/> Payments are secure and encrypted
-                          </p>
-                      </form>
+                      </div>
                   </div>
               </div>
           </div>
