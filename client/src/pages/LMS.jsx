@@ -25,6 +25,7 @@ const LMS = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [showEnrollSuccess, setShowEnrollSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("upi"); // 'upi' or 'card'
+  const [selectedSubMethod, setSelectedSubMethod] = useState(""); // e.g., 'SBI', 'Paytm'
 
   useEffect(() => {
     
@@ -445,7 +446,7 @@ const LMS = () => {
                                 <button 
                                   key={method.id}
                                   type="button"
-                                  onClick={(e) => { e.preventDefault(); setPaymentMethod(method.id); }}
+                                  onClick={(e) => { e.preventDefault(); setPaymentMethod(method.id); setSelectedSubMethod(""); }}
                                   className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition relative group ${paymentMethod === method.id ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-100 hover:border-indigo-200'}`}
                                 >
                                     <div className={`p-2 rounded-lg transition duration-300 ${paymentMethod === method.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-400'}`}>
@@ -485,25 +486,45 @@ const LMS = () => {
 
                           {paymentMethod === "net" && (
                               <div className="space-y-3 animate-in fade-in slide-in-from-right-4">
-                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Popular Banks</p>
+                                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Popular Banks</p>
                                   <div className="grid grid-cols-2 gap-2">
                                       {['SBI', 'HDFC', 'ICICI', 'Axis'].map(bank => (
-                                          <button key={bank} className="p-3 border border-gray-100 rounded-xl text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:border-indigo-200 transition">{bank}</button>
+                                          <button 
+                                            key={bank} 
+                                            type="button"
+                                            onClick={() => setSelectedSubMethod(bank)}
+                                            className={`p-3 border rounded-xl text-sm font-bold transition flex items-center justify-between ${selectedSubMethod === bank ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-100 text-gray-700 hover:bg-gray-50'}`}
+                                          >
+                                            {bank}
+                                            {selectedSubMethod === bank && <div className="w-2 h-2 rounded-full bg-indigo-600"></div>}
+                                          </button>
                                       ))}
                                   </div>
-                                  <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none">
+                                  <select 
+                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none mt-2 focus:ring-2 focus:ring-indigo-500"
+                                    onChange={(e) => setSelectedSubMethod(e.target.value)}
+                                    value={['SBI', 'HDFC', 'ICICI', 'Axis'].includes(selectedSubMethod) ? "Other Banks" : selectedSubMethod}
+                                  >
                                       <option>Other Banks</option>
+                                      <option value="PNB">Punjab National Bank</option>
+                                      <option value="BOB">Bank of Baroda</option>
+                                      <option value="Kotak">Kotak Mahindra</option>
                                   </select>
                               </div>
                           )}
 
                           {paymentMethod === "wallet" && (
-                              <div className="space-y-3 animate-in fade-in slide-in-from-right-4">
-                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Wallet</p>
+                              <div className="space-y-2 animate-in fade-in slide-in-from-right-4">
+                                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Wallet</p>
                                   {['Paytm', 'PhonePe', 'Amazon Pay', 'MobiKwik'].map(wallet => (
-                                      <button key={wallet} className="w-full p-3 border border-gray-100 rounded-xl text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:border-indigo-200 transition text-left flex items-center justify-between">
+                                      <button 
+                                        key={wallet} 
+                                        type="button"
+                                        onClick={() => setSelectedSubMethod(wallet)}
+                                        className={`w-full p-3 border rounded-xl text-sm font-bold transition flex items-center justify-between ${selectedSubMethod === wallet ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-100 text-gray-700 hover:bg-gray-50'}`}
+                                      >
                                           {wallet}
-                                          <div className="w-4 h-4 rounded-full border border-gray-300"></div>
+                                          <div className={`w-4 h-4 rounded-full border transition-all ${selectedSubMethod === wallet ? 'border-indigo-600 bg-indigo-600 border-[5px]' : 'border-gray-300'}`}></div>
                                       </button>
                                   ))}
                               </div>
